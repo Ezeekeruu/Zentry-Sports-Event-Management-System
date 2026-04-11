@@ -21,6 +21,7 @@ class UserController extends Controller
                   ->orWhere('last_name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             })
+            ->orderByDesc('is_active')
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
@@ -92,13 +93,22 @@ class UserController extends Controller
     public function destroy(User $user): RedirectResponse
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot delete your own account.');
+            return back()->with('error', 'You cannot archive your own account.');
         }
 
-        $user->delete();
+        $user->update(['is_active' => false]);
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User deleted successfully.');
+            ->with('success', "{$user->full_name} has been archived.");
+    }
+
+    public function restore(User $user): RedirectResponse
+    {
+        $user->update(['is_active' => true]);
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "{$user->full_name} has been restored.");
     }
 }

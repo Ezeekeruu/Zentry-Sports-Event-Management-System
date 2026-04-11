@@ -12,7 +12,6 @@
     <div class="page-title">User Management</div>
 </div>
 
-{{-- Search and per page --}}
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;">
     <form method="GET" action="{{ route('admin.users.index') }}" style="display:flex;align-items:center;gap:8px;flex:1;max-width:360px;">
         <input type="hidden" name="per_page" value="{{ request('per_page', 15) }}">
@@ -56,7 +55,7 @@
             </thead>
             <tbody>
                 @forelse($users as $user)
-                <tr>
+                <tr style="{{ !$user->is_active ? 'opacity:0.55;background:#fafafa;' : '' }}">
                     <td>
                         <div style="display:flex;align-items:center;gap:8px;">
                             <div class="avatar">{{ strtoupper(substr($user->first_name, 0, 1)) }}</div>
@@ -84,20 +83,33 @@
                         @if($user->is_active)
                             <span class="badge badge-green">ACTIVE</span>
                         @else
-                            <span class="badge badge-gray">INACTIVE</span>
+                            <span class="badge badge-gray">ARCHIVED</span>
                         @endif
                     </td>
                     <td style="font-size:11px;color:#94a3b8;">{{ $user->created_at->format('M d, Y') }}</td>
                     <td>
-                        <div style="display:flex;gap:6px;">
-                            <a href="{{ route('admin.users.edit', $user) }}" class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
-                            @if($user->id !== auth()->id())
-                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                                  onsubmit="return confirm('Delete this user?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-danger">Delete</button>
-                            </form>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            @if($user->is_active)
+                                <a href="{{ route('admin.users.edit', $user) }}"
+                                   class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
+                                @if($user->id !== auth()->id())
+                                    <button type="button" class="btn-danger"
+                                        onclick="confirmArchive(
+                                            '{{ addslashes($user->full_name) }}',
+                                            '{{ route('admin.users.destroy', $user) }}'
+                                        )">
+                                        Archive
+                                    </button>
+                                @endif
+                            @else
+                                <form method="POST" action="{{ route('admin.users.restore', $user) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit"
+                                        style="background:#dcfce7;color:#14532d;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+                                        Restore
+                                    </button>
+                                </form>
                             @endif
                         </div>
                     </td>
@@ -124,7 +136,6 @@
             @else
                 <a href="{{ $users->previousPageUrl() }}&search={{ request('search') }}&per_page={{ request('per_page', 15) }}" style="padding:6px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#0f172a;border:0.5px solid rgba(15,23,42,0.1);background:#fff;text-decoration:none;">‹</a>
             @endif
-
             @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
                 @if($page == $users->currentPage())
                     <span style="padding:6px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#fff;background:#1a2233;border:0.5px solid #1a2233;">{{ $page }}</span>
@@ -132,7 +143,6 @@
                     <a href="{{ $url }}&search={{ request('search') }}&per_page={{ request('per_page', 15) }}" style="padding:6px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#0f172a;border:0.5px solid rgba(15,23,42,0.1);background:#fff;text-decoration:none;">{{ $page }}</a>
                 @endif
             @endforeach
-
             @if($users->hasMorePages())
                 <a href="{{ $users->nextPageUrl() }}&search={{ request('search') }}&per_page={{ request('per_page', 15) }}" style="padding:6px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#0f172a;border:0.5px solid rgba(15,23,42,0.1);background:#fff;text-decoration:none;">›</a>
             @else
@@ -142,4 +152,41 @@
     </div>
     @endif
 </div>
+
+{{-- Archive confirmation modal --}}
+<div id="archive-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:28px;max-width:420px;width:90%;margin:0 auto;">
+        <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0f172a;margin-bottom:8px;">
+            Archive User?
+        </div>
+        <div id="modal-body" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;"></div>
+        <div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350f;margin-bottom:20px;">
+            This user will be deactivated and unable to log in. All their data is preserved. You can restore them anytime.
+        </div>
+        <div style="display:flex;gap:10px;">
+            <form id="archive-form" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                    style="background:#fee2e2;color:#991b1b;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+                    Yes, Archive
+                </button>
+            </form>
+            <button type="button" onclick="closeModal()" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmArchive(name, url) {
+    document.getElementById('modal-body').innerHTML =
+        `You are about to archive <strong>${name}</strong>.<br><br>` +
+        `This user will be deactivated and unable to log in. All their data remains intact.`;
+    document.getElementById('archive-form').action = url;
+    document.getElementById('archive-modal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('archive-modal').style.display = 'none';
+}
+</script>
 @endsection

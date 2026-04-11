@@ -18,28 +18,25 @@ class ZentryMatch extends Model
         'venue',
         'status',
         'round_name',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
             'match_date' => 'date',
+            'is_active'  => 'boolean',
         ];
     }
 
+    public function scopeActive($query)    { return $query->where('is_active', true); }
+    public function scopeArchived($query)  { return $query->where('is_active', false); }
     public function scopeScheduled($query) { return $query->where('status', 'scheduled'); }
     public function scopeLive($query)      { return $query->where('status', 'live'); }
     public function scopeCompleted($query) { return $query->where('status', 'completed'); }
 
-    public function tournament()
-    {
-        return $this->belongsTo(Tournament::class);
-    }
-
-    public function matchTeams()
-    {
-        return $this->hasMany(MatchTeam::class, 'match_id');
-    }
+    public function tournament() { return $this->belongsTo(Tournament::class); }
+    public function matchTeams() { return $this->hasMany(MatchTeam::class, 'match_id'); }
 
     public function teams()
     {

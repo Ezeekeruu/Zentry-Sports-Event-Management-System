@@ -73,17 +73,15 @@
                         @endif
                     </td>
                     <td>
-                        <div style="display:flex;gap:6px;">
+                        <div style="display:flex;gap:6px;align-items:center;">
                             @if($sport->is_active)
                                 <a href="{{ route('admin.sports.edit', $sport) }}"
                                    class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
-                                <button type="button" class="btn-danger"
-                                    onclick="confirmArchive(
-                                        '{{ $sport->sport_name }}',
-                                        {{ $sport->teams_count }},
-                                        {{ $sport->tournaments_count }},
-                                        '{{ route('admin.sports.destroy', $sport) }}'
-                                    )">
+                                <button type="button" class="btn-danger archive-btn"
+                                    data-name="{{ $sport->sport_name }}"
+                                    data-teams="{{ $sport->teams_count }}"
+                                    data-tournaments="{{ $sport->tournaments_count }}"
+                                    data-url="{{ route('admin.sports.destroy', $sport) }}">
                                     Archive
                                 </button>
                             @else
@@ -163,16 +161,25 @@
 </div>
 
 <script>
-function confirmArchive(name, teams, tournaments, url) {
-    document.getElementById('modal-body').innerHTML =
-        `You are about to archive <strong>${name}</strong>.<br><br>` +
-        `This sport currently has:<br>` +
-        `&nbsp;&nbsp;• <strong>${teams}</strong> team(s) attached<br>` +
-        `&nbsp;&nbsp;• <strong>${tournaments}</strong> tournament(s) attached<br><br>` +
-        `These will remain in the database but the sport will be marked as archived.`;
-    document.getElementById('archive-form').action = url;
-    document.getElementById('archive-modal').style.display = 'flex';
-}
+document.querySelectorAll('.archive-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var name        = this.dataset.name;
+        var teams       = this.dataset.teams;
+        var tournaments = this.dataset.tournaments;
+        var url         = this.dataset.url;
+
+        document.getElementById('modal-body').innerHTML =
+            'You are about to archive <strong>' + name + '</strong>.<br><br>' +
+            'This sport currently has:<br>' +
+            '&nbsp;&nbsp;• <strong>' + teams + '</strong> team(s) attached<br>' +
+            '&nbsp;&nbsp;• <strong>' + tournaments + '</strong> tournament(s) attached<br><br>' +
+            'These will remain in the database but the sport will be marked as archived.';
+
+        document.getElementById('archive-form').action = url;
+        document.getElementById('archive-modal').style.display = 'flex';
+    });
+});
+
 function closeModal() {
     document.getElementById('archive-modal').style.display = 'none';
 }

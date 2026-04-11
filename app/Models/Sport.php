@@ -24,26 +24,9 @@ class Sport extends Model
         ];
     }
 
-    // ── Scopes 
+    public function scopeActive($query)   { return $query->where('is_active', true); }
+    public function scopeArchived($query) { return $query->where('is_active', false); }
 
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function scopeArchived($query)
-    {
-        return $query->where('is_active', false);
-    }
-
-    // ── Relationships 
-    public function teams()
-    {
-        return $this->hasMany(Team::class);
-    }
-
-    public function tournaments()
-    {
-        return $this->hasMany(Tournament::class);
-    }
+    public function teams()       { return $this->hasMany(Team::class); }
+    public function tournaments() { return $this->hasMany(Tournament::class); }
 }
