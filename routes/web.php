@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-// ── Home ──────────────────────────────────────────────────────────────────────
+// ── Home 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// ── Auth
 Route::middleware('guest')->group(function () {
     Route::get('login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
+// ── Admin 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -89,7 +89,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('standings', [\App\Http\Controllers\Admin\StandingController::class, 'index'])->name('standings.index');
 });
 
-// ── Organizer ─────────────────────────────────────────────────────────────────
+// ── Organizer 
 Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'role:organizer'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Organizer\DashboardController::class, 'index'])->name('dashboard');
@@ -119,7 +119,7 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'role:organi
     Route::put('results/{matchTeam}', [\App\Http\Controllers\Organizer\ResultController::class, 'update'])->name('results.update');
 });
 
-// ── Coach ─────────────────────────────────────────────────────────────────────
+// ── Coach 
 Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Coach\DashboardController::class, 'index'])->name('dashboard');
@@ -138,7 +138,7 @@ Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->grou
     Route::get('results', [\App\Http\Controllers\Coach\ResultController::class, 'index'])->name('results.index');
 });
 
-// ── Player ────────────────────────────────────────────────────────────────────
+// ── Player
 Route::prefix('player')->name('player.')->middleware(['auth', 'role:player'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Player\DashboardController::class, 'index'])->name('dashboard');
@@ -150,7 +150,7 @@ Route::prefix('player')->name('player.')->middleware(['auth', 'role:player'])->g
     Route::put('profile', [\App\Http\Controllers\Player\ProfileController::class, 'update'])->name('profile.update');
 });
 
-// ── Fan / Public ──────────────────────────────────────────────────────────────
+// ── Fan / Public 
 Route::prefix('public')->name('public.')->group(function () {
     Route::get('tournaments', [\App\Http\Controllers\Public\TournamentController::class, 'index'])->name('tournaments.index');
     Route::get('tournaments/{tournament}', [\App\Http\Controllers\Public\TournamentController::class, 'show'])->name('tournaments.show');

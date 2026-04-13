@@ -185,5 +185,3 @@ function closeModal() {
 }
 </script>
 @endsection
-
-{empty-line}
