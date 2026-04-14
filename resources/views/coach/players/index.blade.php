@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">COACH <span>› PLAYERS</span></div>
     <div class="page-title">{{ $team->team_name }} — Roster</div>
     <div class="page-subtitle">{{ $team->playerProfiles->count() }} player(s) on the team.</div>
 </div>

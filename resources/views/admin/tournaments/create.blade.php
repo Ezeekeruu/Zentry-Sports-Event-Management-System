@@ -5,7 +5,9 @@
 @endsection
 
 @section('content')
-<div style="max-width:600px;margin:0 auto;">
+<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;">
+<div style="width:100%;max-width:660px;">
+
     <div class="page-header">
         <div class="breadcrumb">ADMIN <span>› TOURNAMENTS › CREATE</span></div>
         <div class="page-title">Add Tournament</div>
@@ -62,7 +64,8 @@
                 <div class="form-group">
                     <label class="form-label">Start Date</label>
                     <input type="date" name="start_date" class="form-control"
-                           value="{{ old('start_date') }}" required>
+                           value="{{ old('start_date') }}" required
+                           min="{{ date('Y-m-d') }}">
                     @error('start_date')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
@@ -71,7 +74,8 @@
                 <div class="form-group">
                     <label class="form-label">End Date</label>
                     <input type="date" name="end_date" class="form-control"
-                           value="{{ old('end_date') }}" required>
+                           value="{{ old('end_date') }}" required
+                           min="{{ date('Y-m-d') }}">
                     @error('end_date')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
@@ -94,7 +98,8 @@
                 <div class="form-group">
                     <label class="form-label">Max Teams <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
                     <input type="number" name="max_teams" class="form-control"
-                           value="{{ old('max_teams') }}" min="2" placeholder="Leave blank for unlimited">
+                           value="{{ old('max_teams') }}" min="2"
+                           placeholder="Leave blank for unlimited">
                     @error('max_teams')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
@@ -107,5 +112,7 @@
             </div>
         </form>
     </div>
+
+</div>
 </div>
 @endsection

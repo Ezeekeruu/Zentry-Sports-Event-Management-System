@@ -103,12 +103,6 @@
         </form>
         @endif
 
-        <div style="margin-top:20px;padding-top:16px;border-top:0.5px solid rgba(15,23,42,0.07);">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:8px;">Quick Info</div>
-            <div style="font-size:12px;color:#64748b;line-height:1.7;">
-                Only users with the <strong>Player</strong> role who are not yet assigned to any team appear here.
-            </div>
-        </div>
     </div>
 
 </div>

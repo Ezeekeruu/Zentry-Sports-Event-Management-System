@@ -160,9 +160,7 @@
             Archive User?
         </div>
         <div id="modal-body" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;"></div>
-        <div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350f;margin-bottom:20px;">
-            This user will be deactivated and unable to log in. All their data is preserved. You can restore them anytime.
-        </div>
+
         <div style="display:flex;gap:10px;">
             <form id="archive-form" method="POST">
                 @csrf

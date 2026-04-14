@@ -8,7 +8,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">COACH <span>› MY TEAM</span></div>
     <div class="page-title">{{ $team?->team_name ?? 'No Team Assigned' }}</div>
     @if($team) <div class="page-subtitle">{{ $team->sport->sport_name ?? '' }} &nbsp;·&nbsp; Founded {{ $team->founded_at?->format('Y') ?? 'N/A' }}</div> @endif
 </div>

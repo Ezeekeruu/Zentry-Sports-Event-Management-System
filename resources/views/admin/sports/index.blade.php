@@ -143,9 +143,7 @@
             Archive Sport?
         </div>
         <div id="modal-body" style="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;"></div>
-        <div style="background:#fef3c7;border-left:3px solid #f59e0b;padding:10px 12px;border-radius:6px;font-size:12px;color:#78350f;margin-bottom:20px;">
-            This sport will be hidden from active use but all data is preserved. You can restore it anytime.
-        </div>
+        
         <div style="display:flex;gap:10px;">
             <form id="archive-form" method="POST">
                 @csrf

@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">COACH <span>› MATCHES</span></div>
     <div class="page-title">Match Schedule</div>
     <div class="page-subtitle">{{ $team->team_name }} matches.</div>
 </div>
