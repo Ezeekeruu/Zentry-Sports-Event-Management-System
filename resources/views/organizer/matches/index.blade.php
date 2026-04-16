@@ -25,7 +25,7 @@
         <input type="hidden" name="status" value="{{ request('status') }}">
         <select name="per_page" onchange="this.form.submit()"
                 style="padding:7px 10px;border:1px solid rgba(15,23,42,0.12);border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;color:#0f172a;background:#fff;outline:none;cursor:pointer;">
-            @foreach([5,10,15,25] as $o)
+            @foreach([5, 10, 15,20, 25, 50] as $o)
                 <option value="{{ $o }}" {{ request('per_page',10)==$o?'selected':'' }}>{{ $o }}</option>
             @endforeach
         </select>
