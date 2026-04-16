@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">PLAYER <span>› MATCHES</span></div>
     <div class="page-title">Matches</div>
     @if($team)<div class="page-subtitle">{{ $team->team_name }} schedule.</div>@endif
 </div>

@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">PLAYER <span>› MY TEAM</span></div>
     <div class="page-title">{{ $team?->team_name ?? 'No Team' }}</div>
     @if($team)<div class="page-subtitle">{{ $team->sport->sport_name ?? '' }} &nbsp;·&nbsp; Coach: {{ $team->coach ? $team->coach->first_name.' '.$team->coach->last_name : 'None' }}</div>@endif
 </div>

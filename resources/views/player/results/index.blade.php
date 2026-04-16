@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">PLAYER <span>› RESULTS</span></div>
     <div class="page-title">Results</div>
     @if($team)<div class="page-subtitle">{{ $team->team_name }} match history.</div>@endif
 </div>
