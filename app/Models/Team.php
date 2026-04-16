@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Team extends Model
 {
@@ -40,5 +41,18 @@ class Team extends Model
         return $this->belongsToMany(Tournament::class, 'registrations')
                     ->withPivot('registration_date', 'status', 'notes')
                     ->withTimestamps();
+    }
+
+    public function getLogoSrcAttribute(): ?string
+    {
+        if (! $this->logo_url) {
+            return null;
+        }
+
+        if (filter_var($this->logo_url, FILTER_VALIDATE_URL)) {
+            return $this->logo_url;
+        }
+
+        return Storage::url($this->logo_url);
     }
 }

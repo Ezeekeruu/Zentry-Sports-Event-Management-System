@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Team;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class TeamController extends Controller
@@ -31,11 +32,24 @@ class TeamController extends Controller
 
         $request->validate([
             'team_name'  => ['required', 'string', 'max:255', 'unique:teams,team_name,' . $team->id],
-            'logo_url'   => ['nullable', 'url', 'max:500'],
+            'logo'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
             'founded_at' => ['nullable', 'date'],
         ]);
 
-        $team->update($request->only('team_name', 'logo_url', 'founded_at'));
+        $logoPath = $team->logo_url;
+        if ($request->hasFile('logo')) {
+            if ($team->logo_url && ! filter_var($team->logo_url, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($team->logo_url);
+            }
+
+            $logoPath = $request->file('logo')->store('team-logos', 'public');
+        }
+
+        $team->update([
+            'team_name'  => $request->team_name,
+            'logo_url'   => $logoPath,
+            'founded_at' => $request->founded_at,
+        ]);
 
         return redirect()->route('coach.team.show')->with('success', 'Team updated successfully.');
     }

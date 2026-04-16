@@ -9,7 +9,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">ORGANIZER <span>› TOURNAMENTS</span></div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
         <div class="page-title">{{ $tournament->tournament_name }}</div>
         @if($tournament->status==='ongoing') <span class="badge badge-green" style="font-size:11px;padding:4px 10px;">ONGOING</span>

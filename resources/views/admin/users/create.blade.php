@@ -11,7 +11,6 @@
 @section('content')
 <div style="max-width:560px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› USER MANAGEMENT › CREATE</span></div>
         <div class="page-title">Add User</div>
         <div class="page-subtitle">Create a new user account and assign a role.</div>
     </div>

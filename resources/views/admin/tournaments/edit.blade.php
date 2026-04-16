@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:600px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› TOURNAMENTS › EDIT</span></div>
         <div class="page-title">Edit Tournament</div>
         <div class="page-subtitle">Update details for {{ $tournament->tournament_name }}.</div>
     </div>

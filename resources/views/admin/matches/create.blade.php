@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:620px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› MATCH SCHEDULE › CREATE</span></div>
         <div class="page-title">Schedule Match</div>
         <div class="page-subtitle">Create a new match and assign participating teams.</div>
     </div>

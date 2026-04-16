@@ -9,7 +9,6 @@
 <div style="width:100%;max-width:580px;">
 
     <div class="page-header">
-        <div class="breadcrumb">ORGANIZER <span>› TOURNAMENTS › CREATE</span></div>
         <div class="page-title">New Tournament</div>
         <div class="page-subtitle">Create a new tournament.</div>
     </div>

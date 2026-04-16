@@ -6,7 +6,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">ADMIN <span>› TEAMS › {{ strtoupper($team->team_name) }} › PLAYERS</span></div>
     <div class="page-title">{{ $team->team_name }}</div>
     <div class="page-subtitle">
         {{ $team->sport->sport_name ?? '—' }} &nbsp;·&nbsp;
@@ -78,7 +77,7 @@
 
         @if($availablePlayers->isEmpty())
             <div style="font-size:13px;color:#94a3b8;padding:12px 0;">
-                No unassigned players available. Create player accounts first.
+                No unassigned players available. 
             </div>
         @else
         <form method="POST" action="{{ route('admin.teams.players.add', $team) }}">

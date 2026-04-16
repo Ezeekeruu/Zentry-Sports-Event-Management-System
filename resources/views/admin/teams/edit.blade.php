@@ -7,13 +7,12 @@
 @section('content')
 <div style="max-width:560px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› TEAMS › EDIT</span></div>
         <div class="page-title">Edit Team</div>
         <div class="page-subtitle">Update details for {{ $team->team_name }}.</div>
     </div>
 
     <div class="card">
-        <form method="POST" action="{{ route('admin.teams.update', $team) }}">
+        <form method="POST" action="{{ route('admin.teams.update', $team) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -68,10 +67,15 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Logo URL <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
-                <input type="url" name="logo_url" class="form-control"
-                       value="{{ old('logo_url', $team->logo_url) }}" placeholder="https://...">
-                @error('logo_url')
+                <label class="form-label">Team Logo <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+                @if($team->logo_src)
+                    <div style="margin-bottom:10px;">
+                        <img src="{{ $team->logo_src }}" alt="{{ $team->team_name }} logo" style="width:56px;height:56px;object-fit:cover;border-radius:10px;border:1px solid rgba(15,23,42,0.08);background:#fff;">
+                    </div>
+                @endif
+                <input type="file" name="logo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif,image/*">
+                <div style="font-size:11px;color:#94a3b8;margin-top:6px;">Upload a new PNG, JPG, WEBP, or GIF file up to 2MB to replace the current logo.</div>
+                @error('logo')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>

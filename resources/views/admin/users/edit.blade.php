@@ -5,7 +5,6 @@
 <div style="width:100%;max-width:560px;">
 
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› USER MANAGEMENT › EDIT</span></div>
         <div class="page-title">Edit User</div>
         <div class="page-subtitle">Update account details for {{ $user->full_name }}.</div>
     </div>

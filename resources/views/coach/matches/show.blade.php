@@ -6,7 +6,6 @@
 
 @section('content')
 <div class="page-header">
-    <div class="breadcrumb">COACH <span>› MATCHES › DETAIL</span></div>
     <div class="page-title">{{ $match->round_name ?: 'Match Detail' }}</div>
     <div class="page-subtitle">{{ $match->tournament->tournament_name ?? '' }} — {{ $match->match_date->format('M d, Y') }}</div>
 </div>

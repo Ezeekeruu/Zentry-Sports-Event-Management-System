@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:560px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› RESULTS › RECORD</span></div>
         <div class="page-title">Record Result</div>
         <div class="page-subtitle">
             {{ $matchTeam->team->team_name ?? '—' }} —

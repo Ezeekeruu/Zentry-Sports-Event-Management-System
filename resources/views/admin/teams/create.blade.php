@@ -7,13 +7,12 @@
 @section('content')
 <div style="max-width:560px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› TEAMS › CREATE</span></div>
         <div class="page-title">Add Team</div>
         <div class="page-subtitle">Create a new team and assign a coach.</div>
     </div>
 
     <div class="card">
-        <form method="POST" action="{{ route('admin.teams.store') }}">
+        <form method="POST" action="{{ route('admin.teams.store') }}" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -68,10 +67,10 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Logo URL <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
-                <input type="url" name="logo_url" class="form-control"
-                       value="{{ old('logo_url') }}" placeholder="https://...">
-                @error('logo_url')
+                <label class="form-label">Team Logo <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+                <input type="file" name="logo" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif,image/*">
+                <div style="font-size:11px;color:#94a3b8;margin-top:6px;">Upload a PNG, JPG, WEBP, or GIF file up to 2MB.</div>
+                @error('logo')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>

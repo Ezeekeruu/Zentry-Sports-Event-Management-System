@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:600px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ORGANIZER <span>› MATCHES › SCHEDULE</span></div>
         <div class="page-title">Schedule Match</div>
     </div>
     <div class="card">

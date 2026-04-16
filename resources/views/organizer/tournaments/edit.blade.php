@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:580px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ORGANIZER <span>› TOURNAMENTS › EDIT</span></div>
         <div class="page-title">Edit Tournament</div>
     </div>
     <div class="card">

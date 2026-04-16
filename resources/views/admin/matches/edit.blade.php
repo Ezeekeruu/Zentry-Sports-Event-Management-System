@@ -7,7 +7,6 @@
 @section('content')
 <div style="max-width:620px;margin:0 auto;">
     <div class="page-header">
-        <div class="breadcrumb">ADMIN <span>› MATCH SCHEDULE › EDIT</span></div>
         <div class="page-title">Edit Match</div>
         <div class="page-subtitle">
             {{ $match->tournament->tournament_name ?? '' }} &nbsp;·&nbsp;

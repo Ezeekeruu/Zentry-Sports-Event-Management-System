@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\PlayerProfile;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class TeamController extends Controller
@@ -50,7 +51,7 @@ class TeamController extends Controller
             'team_name'  => ['required', 'string', 'max:255', 'unique:teams,team_name'],
             'sport_id'   => ['required', 'exists:sports,id'],
             'coach_id'   => ['required', 'exists:users,id'],
-            'logo_url'   => ['nullable', 'url', 'max:500'],
+            'logo'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
             'founded_at' => ['nullable', 'date'],
         ]);
 
@@ -59,11 +60,15 @@ class TeamController extends Controller
             return back()->withInput()->withErrors(['coach_id' => 'This coach already leads another active team.']);
         }
 
+        $logoPath = $request->hasFile('logo')
+            ? $request->file('logo')->store('team-logos', 'public')
+            : null;
+
         Team::create([
             'team_name'  => $request->team_name,
             'sport_id'   => $request->sport_id,
             'coach_id'   => $request->coach_id,
-            'logo_url'   => $request->logo_url,
+            'logo_url'   => $logoPath,
             'founded_at' => $request->founded_at,
             'is_active'  => true,
         ]);
@@ -85,7 +90,7 @@ class TeamController extends Controller
             'team_name'  => ['required', 'string', 'max:255', 'unique:teams,team_name,' . $team->id],
             'sport_id'   => ['required', 'exists:sports,id'],
             'coach_id'   => ['required', 'exists:users,id'],
-            'logo_url'   => ['nullable', 'url', 'max:500'],
+            'logo'       => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
             'founded_at' => ['nullable', 'date'],
         ]);
 
@@ -94,11 +99,20 @@ class TeamController extends Controller
             return back()->withInput()->withErrors(['coach_id' => 'This coach already leads another active team.']);
         }
 
+        $logoPath = $team->logo_url;
+        if ($request->hasFile('logo')) {
+            if ($team->logo_url && ! filter_var($team->logo_url, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($team->logo_url);
+            }
+
+            $logoPath = $request->file('logo')->store('team-logos', 'public');
+        }
+
         $team->update([
             'team_name'  => $request->team_name,
             'sport_id'   => $request->sport_id,
             'coach_id'   => $request->coach_id,
-            'logo_url'   => $request->logo_url,
+            'logo_url'   => $logoPath,
             'founded_at' => $request->founded_at,
             'is_active'  => $request->boolean('is_active'),
         ]);
