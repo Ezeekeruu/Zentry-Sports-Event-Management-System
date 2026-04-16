@@ -1,8 +1,10 @@
 @extends('layouts.public')
 
 @section('content')
-<div style="margin-bottom:6px;">
-    <a href="{{ route('public.tournaments.index') }}" style="font-size:12px;color:#64748b;text-decoration:none;">← All Tournaments</a>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+    <a href="{{ route('public.tournaments.index') }}" class="btn-secondary" style="padding:7px 12px;">
+        ← Back to Tournaments
+    </a>
 </div>
 
 <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">

@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // ── Admin 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'prevent-back-history', 'role:admin'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
@@ -90,7 +90,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 });
 
 // ── Organizer 
-Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'role:organizer'])->group(function () {
+Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'prevent-back-history', 'role:organizer'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Organizer\DashboardController::class, 'index'])->name('dashboard');
 
@@ -120,7 +120,7 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'role:organi
 });
 
 // ── Coach 
-Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->group(function () {
+Route::prefix('coach')->name('coach.')->middleware(['auth', 'prevent-back-history', 'role:coach'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Coach\DashboardController::class, 'index'])->name('dashboard');
 
@@ -136,10 +136,13 @@ Route::prefix('coach')->name('coach.')->middleware(['auth', 'role:coach'])->grou
     Route::get('matches/{match}', [\App\Http\Controllers\Coach\MatchController::class, 'show'])->name('matches.show');
 
     Route::get('results', [\App\Http\Controllers\Coach\ResultController::class, 'index'])->name('results.index');
+
+    Route::get('registrations', [\App\Http\Controllers\Coach\RegistrationController::class, 'index'])->name('registrations.index');
+    Route::post('registrations', [\App\Http\Controllers\Coach\RegistrationController::class, 'store'])->name('registrations.store');
 });
 
 // ── Player
-Route::prefix('player')->name('player.')->middleware(['auth', 'role:player'])->group(function () {
+Route::prefix('player')->name('player.')->middleware(['auth', 'prevent-back-history', 'role:player'])->group(function () {
 
     Route::get('dashboard', [\App\Http\Controllers\Player\DashboardController::class, 'index'])->name('dashboard');
     Route::get('team', [\App\Http\Controllers\Player\TeamController::class, 'show'])->name('team.show');

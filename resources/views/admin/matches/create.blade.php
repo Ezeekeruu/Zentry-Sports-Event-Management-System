@@ -55,18 +55,18 @@
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="form-group">
-                    <label class="form-label">Venue <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+                    <label class="form-label">Venue <span style="color:#94a3b8;font-weight:400;"></span></label>
                     <input type="text" name="venue" class="form-control"
-                           value="{{ old('venue') }}" placeholder="e.g. Main Court A">
+                           value="{{ old('venue') }}" placeholder="e.g. Main Court A" required>
                     @error('venue')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Round / Stage <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+                    <label class="form-label">Round / Stage <span style="color:#94a3b8;font-weight:400;"></span></label>
                     <input type="text" name="round_name" class="form-control"
-                           value="{{ old('round_name') }}" placeholder="e.g. Quarter Finals">
+                           value="{{ old('round_name') }}" placeholder="e.g. Quarter Finals" required>
                     @error('round_name')
                         <div class="form-error">{{ $message }}</div>
                     @enderror

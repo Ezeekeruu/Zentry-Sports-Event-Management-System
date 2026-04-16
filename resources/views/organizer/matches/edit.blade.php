@@ -34,11 +34,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="form-group">
                     <label class="form-label">Venue</label>
-                    <input type="text" name="venue" class="form-control" value="{{ old('venue',$match->venue) }}">
+                    <input type="text" name="venue" class="form-control" value="{{ old('venue',$match->venue) }}" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Round</label>
-                    <input type="text" name="round_name" class="form-control" value="{{ old('round_name',$match->round_name) }}">
+                    <input type="text" name="round_name" class="form-control" value="{{ old('round_name',$match->round_name) }}" required>
                 </div>
             </div>
             <div class="form-group">

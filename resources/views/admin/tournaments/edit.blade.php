@@ -94,7 +94,7 @@
                 <div class="form-group">
                     <label class="form-label">Max Teams</label>
                     <input type="number" name="max_teams" class="form-control"
-                           value="{{ old('max_teams', $tournament->max_teams) }}" min="2">
+                           value="{{ old('max_teams', $tournament->max_teams) }}" min="2" required>
                     @error('max_teams')
                         <div class="form-error">{{ $message }}</div>
                     @enderror

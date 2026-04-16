@@ -31,4 +31,9 @@ class MatchTeam extends Model
     {
         return $this->hasOne(Result::class);
     }
+
+    public function playerStats()
+    {
+        return $this->hasMany(PlayerMatchStat::class);
+    }
 }

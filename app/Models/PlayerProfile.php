@@ -25,4 +25,9 @@ class PlayerProfile extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function matchStats()
+    {
+        return $this->hasMany(PlayerMatchStat::class);
+    }
 }

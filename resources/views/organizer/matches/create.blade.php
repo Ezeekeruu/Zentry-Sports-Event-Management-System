@@ -36,12 +36,12 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="form-group">
-                    <label class="form-label">Venue <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
-                    <input type="text" name="venue" class="form-control" value="{{ old('venue') }}" placeholder="e.g. Court A">
+                    <label class="form-label">Venue <span style="color:#94a3b8;font-weight:400;"></span></label>
+                    <input type="text" name="venue" class="form-control" value="{{ old('venue') }}" placeholder="e.g. Court A" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Round <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
-                    <input type="text" name="round_name" class="form-control" value="{{ old('round_name') }}" placeholder="e.g. Semifinals">
+                    <label class="form-label">Round <span style="color:#94a3b8;font-weight:400;"></span></label>
+                    <input type="text" name="round_name" class="form-control" value="{{ old('round_name') }}" placeholder="e.g. Semifinals" required>
                 </div>
             </div>
             <div class="form-group">

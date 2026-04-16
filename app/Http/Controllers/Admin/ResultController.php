@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MatchTeam;
+use App\Models\PlayerMatchStat;
 use App\Models\Result;
 use App\Models\ZentryMatch;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class ResultController extends Controller
 
     public function edit(MatchTeam $matchTeam): View
     {
-        $matchTeam->load(['match.tournament', 'team', 'result']);
+        $matchTeam->load(['match.tournament', 'team.playerProfiles.user', 'result', 'playerStats']);
         return view('admin.results.edit', compact('matchTeam'));
     }
 
@@ -42,6 +43,8 @@ class ResultController extends Controller
             'seed_number'    => ['nullable', 'integer', 'min:1'],
             'summary'        => ['nullable', 'string', 'max:1000'],
             'highest_score'  => ['nullable', 'numeric', 'min:0'],
+            'player_stats'   => ['nullable', 'array'],
+            'player_stats.*.points' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $matchTeam->update([
@@ -59,6 +62,34 @@ class ResultController extends Controller
                 'recorded_at'   => now(),
             ]
         );
+
+        $allowedPlayerIds = $matchTeam->team->playerProfiles()->pluck('id')->all();
+        $playerStatsInput = $request->input('player_stats', []);
+
+        foreach ($playerStatsInput as $playerProfileId => $statRow) {
+            if (! in_array((int) $playerProfileId, $allowedPlayerIds, true)) {
+                continue;
+            }
+
+            $points = $statRow['points'] ?? null;
+
+            if ($points === null || $points === '') {
+                PlayerMatchStat::where('match_team_id', $matchTeam->id)
+                    ->where('player_profile_id', $playerProfileId)
+                    ->delete();
+                continue;
+            }
+
+            PlayerMatchStat::updateOrCreate(
+                [
+                    'match_team_id' => $matchTeam->id,
+                    'player_profile_id' => $playerProfileId,
+                ],
+                [
+                    'points' => (int) $points,
+                ]
+            );
+        }
 
         return redirect()->route('admin.results.index')->with('success', 'Result recorded successfully.');
     }

@@ -42,6 +42,7 @@
         <form method="POST" action="{{ route('admin.results.update', $matchTeam) }}">
             @csrf
             @method('PUT')
+            @php($existingPlayerStats = $matchTeam->playerStats->keyBy('player_profile_id'))
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div class="form-group">
@@ -93,6 +94,35 @@
                 @error('summary')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div style="border-top:0.5px solid rgba(15,23,42,0.08);margin:16px 0;padding-top:16px;">
+                <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;">
+                    Player Stats (Individual)
+                </div>
+                @if($matchTeam->team->playerProfiles->isEmpty())
+                    <div style="font-size:12px;color:#94a3b8;">No players found for this team.</div>
+                @else
+                    <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;">
+                        @foreach($matchTeam->team->playerProfiles as $profile)
+                            <div style="font-size:12px;font-weight:600;align-self:center;">
+                                {{ $profile->user->first_name ?? '—' }} {{ $profile->user->last_name ?? '' }}
+                                @if($profile->position)
+                                    <span style="font-size:10px;color:#94a3b8;font-weight:500;">({{ $profile->position }})</span>
+                                @endif
+                            </div>
+                            <div>
+                                <input type="number"
+                                       name="player_stats[{{ $profile->id }}][points]"
+                                       class="form-control"
+                                       min="0"
+                                       placeholder="Points"
+                                       value="{{ old('player_stats.'.$profile->id.'.points', $existingPlayerStats[$profile->id]->points ?? null) }}">
+                            </div>
+                        @endforeach
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:8px;">Leave blank to clear a player's stat for this match.</div>
+                @endif
             </div>
 
             <div style="display:flex;gap:10px;margin-top:8px;">

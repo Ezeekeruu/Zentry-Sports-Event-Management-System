@@ -12,7 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #f8faff; color: #0f172a; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: #f8faff; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; }
 
         .topnav { background: #1a2233; padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
         .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -31,7 +31,7 @@
         .btn-nav-cta { padding: 6px 14px; font-size: 12px; font-weight: 600; color: #fff; text-decoration: none; border-radius: 6px; background: #22c55e; transition: background .12s; }
         .btn-nav-cta:hover { background: #16a34a; color: #fff; }
 
-        .page-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+        .page-wrap { max-width: 1100px; width: 100%; margin: 0 auto; padding: 28px 24px; flex: 1; }
 
         .page-title { font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; color: #0f172a; }
         .page-subtitle { font-size: 13px; color: #64748b; margin-top: 4px; }
@@ -64,7 +64,7 @@
         .form-control { width: 100%; padding: 9px 12px; border: 1px solid rgba(15,23,42,0.12); border-radius: 7px; font-size: 13px; font-family: 'Inter', sans-serif; color: #0f172a; background: #fff; outline: none; transition: border .12s; }
         .form-control:focus { border-color: #22c55e; }
 
-        footer { background: #1a2233; padding: 20px 32px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 48px; }
+        footer { background: #1a2233; padding: 20px 32px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); margin-top: auto; }
     </style>
 </head>
 <body>

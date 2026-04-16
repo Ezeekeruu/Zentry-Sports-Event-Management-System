@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Organizer;
 
 use App\Http\Controllers\Controller;
 use App\Models\MatchTeam;
+use App\Models\PlayerMatchStat;
 use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +26,7 @@ class ResultController extends Controller
     public function edit(MatchTeam $matchTeam): View
     {
         if ($matchTeam->match->tournament->organizer_id !== auth()->id()) abort(403);
-        $matchTeam->load(['match.tournament', 'team', 'result']);
+        $matchTeam->load(['match.tournament', 'team.playerProfiles.user', 'result', 'playerStats']);
         return view('organizer.results.edit', compact('matchTeam'));
     }
 
@@ -38,6 +39,8 @@ class ResultController extends Controller
             'rank_position' => ['nullable', 'integer', 'min:1'],
             'summary'       => ['nullable', 'string', 'max:1000'],
             'highest_score' => ['nullable', 'numeric', 'min:0'],
+            'player_stats'  => ['nullable', 'array'],
+            'player_stats.*.points' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $matchTeam->update([
@@ -54,6 +57,34 @@ class ResultController extends Controller
                 'recorded_at'   => now(),
             ]
         );
+
+        $allowedPlayerIds = $matchTeam->team->playerProfiles()->pluck('id')->all();
+        $playerStatsInput = $request->input('player_stats', []);
+
+        foreach ($playerStatsInput as $playerProfileId => $statRow) {
+            if (! in_array((int) $playerProfileId, $allowedPlayerIds, true)) {
+                continue;
+            }
+
+            $points = $statRow['points'] ?? null;
+
+            if ($points === null || $points === '') {
+                PlayerMatchStat::where('match_team_id', $matchTeam->id)
+                    ->where('player_profile_id', $playerProfileId)
+                    ->delete();
+                continue;
+            }
+
+            PlayerMatchStat::updateOrCreate(
+                [
+                    'match_team_id' => $matchTeam->id,
+                    'player_profile_id' => $playerProfileId,
+                ],
+                [
+                    'points' => (int) $points,
+                ]
+            );
+        }
 
         return redirect()->route('organizer.results.index')->with('success', 'Result recorded.');
     }

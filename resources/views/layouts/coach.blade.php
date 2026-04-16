@@ -106,6 +106,13 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 1 2 2h14a2 2 0 0 1 2-2v-6a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v6"/></svg>
             Results
         </a>
+        <a href="{{ route('coach.registrations.index') }}" class="sb-item {{ request()->routeIs('coach.registrations.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                <rect x="9" y="3" width="6" height="4" rx="1"/>
+            </svg>
+            Registrations
+        </a>
     </div>
     <div class="sb-footer">
         <div style="display:flex;align-items:center;gap:8px;">

@@ -108,6 +108,15 @@
     <div class="sb-nav">
         <div class="sb-section">My Tournaments</div>
 
+        <a href="{{ route('organizer.dashboard') }}"
+           class="sb-item {{ request()->routeIs('organizer.dashboard') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            Dashboard
+        </a>
+
         <a href="{{ route('organizer.tournaments.index') }}"
            class="sb-item {{ request()->routeIs('organizer.tournaments.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
