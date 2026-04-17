@@ -57,7 +57,10 @@
                         @else <span class="badge badge-blue">SCHED</span> @endif
                     </td>
                     <td>
-                        <a href="{{ route('organizer.matches.edit', $match) }}" class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <a href="{{ route('organizer.matches.edit', $match) }}" class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
+                            <a href="{{ route('organizer.matches.winner.edit', $match) }}" class="btn-secondary" style="padding:5px 10px;font-size:11px;">Update/Winner</a>
+                        </div>
                     </td>
                 </tr>
                 @empty

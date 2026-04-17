@@ -13,7 +13,15 @@ class PlayerMatchStat extends Model
         'player_profile_id',
         'match_team_id',
         'points',
+        'stat_line',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'stat_line' => 'array',
+        ];
+    }
 
     public function playerProfile()
     {

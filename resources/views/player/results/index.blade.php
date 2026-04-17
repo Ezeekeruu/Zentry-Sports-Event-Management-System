@@ -12,12 +12,46 @@
 </div>
 @else
 
+<div class="grid-3">
+    <div class="stat-card">
+        <div class="stat-label">Career Points</div>
+        <div class="stat-value">{{ $careerTotals['total_points'] }}</div>
+        <div class="stat-sub">Encoded personal points</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Games With Player Stats</div>
+        <div class="stat-value">{{ $careerTotals['matches_with_stats'] }}</div>
+        <div class="stat-sub">Completed matches only</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Other Totals</div>
+        <div class="stat-value" style="font-size:18px;line-height:1.2;">
+            @if(!empty($careerTotals['stat_totals']))
+                {{ collect($careerTotals['stat_totals'])->except('points')->map(fn($value, $key) => ucfirst(str_replace('_', ' ', $key)).': '.$value)->take(2)->join(' | ') ?: '—' }}
+            @else
+                —
+            @endif
+        </div>
+        <div class="stat-sub">Based on recorded individual stats</div>
+    </div>
+</div>
+
 <div class="card">
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Tournament</th><th>Match</th><th>Date</th><th>Points</th><th>Rank</th><th>Summary</th></tr></thead>
+            <thead><tr><th>Tournament</th><th>Match</th><th>Date</th><th>Points</th><th>Rank</th><th>Your Stats</th><th>Summary</th></tr></thead>
             <tbody>
                 @forelse($matchTeams as $mt)
+                @php
+                    $myStats = $mt->playerStats->first();
+                    $statLine = $myStats?->stat_line ?? [];
+                    if (empty($statLine) && $myStats?->points !== null) {
+                        $statLine = ['points' => $myStats->points];
+                    }
+                    $statSummary = collect($statLine)->map(function ($value, $key) {
+                        return ucfirst(str_replace('_', ' ', $key)) . ': ' . $value;
+                    })->join(' · ');
+                @endphp
                 <tr>
                     <td style="font-size:12px;font-weight:500;">{{ Str::limit($mt->match->tournament->tournament_name??'—',22) }}</td>
                     <td style="font-size:12px;color:#64748b;">{{ $mt->match->round_name ?: ('Match #'.$mt->match->id) }}</td>
@@ -37,12 +71,15 @@
                         @elseif($mt->rank_position) <span class="badge badge-gray">#{{ $mt->rank_position }}</span>
                         @else <span style="color:#94a3b8;font-size:12px;">—</span> @endif
                     </td>
+                    <td style="font-size:12px;color:#334155;">
+                        {{ $statSummary ?: 'No individual stat recorded yet' }}
+                    </td>
                     <td style="font-size:12px;color:#64748b;">
                         {{ $mt->result?->summary ? Str::limit($mt->result->summary,40) : '—' }}
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No completed matches yet.</td></tr>
+                <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:30px;">No completed matches yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -123,6 +123,8 @@
                             @if($match->is_active)
                                 <a href="{{ route('admin.matches.edit', $match) }}"
                                    class="btn-secondary" style="padding:5px 10px;font-size:11px;">Edit</a>
+                                <a href="{{ route('admin.matches.winner.edit', $match) }}"
+                                   class="btn-secondary" style="padding:5px 10px;font-size:11px;">Update/Winner</a>
                                 <button type="button" class="btn-danger archive-btn"
                                     data-name="{{ $match->matchTeams->map(fn($mt) => $mt->team->team_name ?? '?')->join(' vs ') }}"
                                     data-url="{{ route('admin.matches.destroy', $match) }}">

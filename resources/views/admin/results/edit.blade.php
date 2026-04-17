@@ -102,7 +102,11 @@
                 @if($matchTeam->team->playerProfiles->isEmpty())
                     <div style="font-size:12px;color:#94a3b8;">No players found for this team.</div>
                 @else
-                    <div style="display:grid;grid-template-columns:1fr 130px;gap:10px;">
+                    <div style="display:grid;grid-template-columns:1.2fr repeat({{ count($statFields) }}, minmax(80px, 1fr));gap:8px;align-items:center;">
+                        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">Player</div>
+                        @foreach($statFields as $label)
+                            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;">{{ $label }}</div>
+                        @endforeach
                         @foreach($matchTeam->team->playerProfiles as $profile)
                             <div style="font-size:12px;font-weight:600;align-self:center;">
                                 {{ $profile->user->first_name ?? '—' }} {{ $profile->user->last_name ?? '' }}
@@ -110,14 +114,16 @@
                                     <span style="font-size:10px;color:#94a3b8;font-weight:500;">({{ $profile->position }})</span>
                                 @endif
                             </div>
-                            <div>
-                                <input type="number"
-                                       name="player_stats[{{ $profile->id }}][points]"
-                                       class="form-control"
-                                       min="0"
-                                       placeholder="Points"
-                                       value="{{ old('player_stats.'.$profile->id.'.points', $existingPlayerStats[$profile->id]->points ?? null) }}">
-                            </div>
+                            @foreach($statFields as $key => $label)
+                                <div>
+                                    <input type="number"
+                                           name="player_stats[{{ $profile->id }}][{{ $key }}]"
+                                           class="form-control"
+                                           min="0"
+                                           placeholder="{{ $label }}"
+                                           value="{{ old('player_stats.'.$profile->id.'.'.$key, $existingPlayerStats[$profile->id]->stat_line[$key] ?? $existingPlayerStats[$profile->id]->points ?? null) }}">
+                                </div>
+                            @endforeach
                         @endforeach
                     </div>
                     <div style="font-size:11px;color:#94a3b8;margin-top:8px;">Leave blank to clear a player's stat for this match.</div>

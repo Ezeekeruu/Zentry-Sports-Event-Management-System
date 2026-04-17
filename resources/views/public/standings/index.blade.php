@@ -56,6 +56,7 @@
                     <th>Team</th>
                     <th>Played</th>
                     <th>Wins</th>
+                    <th>Draws</th>
                     <th>Losses</th>
                     <th>Points</th>
                     <th>Win Rate</th>
@@ -77,6 +78,7 @@
                     </td>
                     <td style="font-size:13px;color:#64748b;">{{ $row['matches_played'] }}</td>
                     <td><span style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#16a34a;">{{ $row['wins'] }}</span></td>
+                    <td><span style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0ea5e9;">{{ $row['draws'] }}</span></td>
                     <td><span style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#94a3b8;">{{ $row['losses'] }}</span></td>
                     <td><span style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0f172a;">{{ $row['total_points'] }}</span></td>
                     <td>
@@ -94,6 +96,40 @@
     </div>
 </div>
 @endif
+
+<div class="card" style="margin-top:16px;">
+    <div style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;margin-bottom:10px;">Bracket / Advancement</div>
+    @if($bracketRounds->isEmpty())
+        <div style="text-align:center;color:#94a3b8;padding:10px 0;font-size:13px;">No bracket data yet.</div>
+    @else
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;">
+            @foreach($bracketRounds as $round => $roundMatches)
+                <div style="border:0.5px solid rgba(15,23,42,0.08);border-radius:10px;padding:10px;background:#fafcff;">
+                    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:8px;">{{ $round }}</div>
+                    @foreach($roundMatches as $slot)
+                        <div style="border:0.5px solid rgba(15,23,42,0.08);border-radius:8px;background:#fff;padding:8px;margin-bottom:8px;">
+                            <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">
+                                {{ $slot['match']->match_date?->format('M d, Y') ?? 'TBD' }}
+                            </div>
+                            @foreach($slot['teams'] as $teamName)
+                                <div style="font-size:12px;font-weight:600;">{{ $teamName }}</div>
+                            @endforeach
+                            <div style="font-size:11px;color:#334155;margin-top:6px;">
+                                @if($slot['winners']->isNotEmpty())
+                                    Advances: {{ $slot['winners']->join(', ') }}
+                                @elseif($slot['drawn']->isNotEmpty())
+                                    Draw: {{ $slot['drawn']->join(', ') }}
+                                @else
+                                    Awaiting result
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 
 @elseif(request('tournament_id'))
 <div class="card" style="text-align:center;padding:40px;color:#94a3b8;">Tournament not found.</div>

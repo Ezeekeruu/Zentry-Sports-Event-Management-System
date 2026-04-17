@@ -14,10 +14,15 @@
             @csrf
             <div class="form-group">
                 <label class="form-label">Tournament</label>
-                <select name="tournament_id" class="form-control" required>
+                <select name="tournament_id" class="form-control" required id="tournament-select">
                     <option value="">Select your tournament</option>
                     @foreach($tournaments as $t)
-                        <option value="{{ $t->id }}" {{ old('tournament_id')==$t->id?'selected':'' }}>{{ $t->tournament_name }}</option>
+                        <option value="{{ $t->id }}"
+                                data-sport="{{ $t->sport_id }}"
+                                data-approved-teams="{{ $t->registrations->pluck('team_id')->implode(',') }}"
+                                {{ old('tournament_id')==$t->id?'selected':'' }}>
+                            {{ $t->tournament_name }}
+                        </option>
                     @endforeach
                 </select>
                 @error('tournament_id') <div class="form-error">{{ $message }}</div> @enderror
@@ -55,7 +60,10 @@
                 <label class="form-label">Teams (select at least 2)</label>
                 <div style="border:1px solid rgba(15,23,42,0.12);border-radius:7px;padding:10px;max-height:200px;overflow-y:auto;">
                     @foreach($teams as $team)
-                    <label style="display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer;font-size:13px;">
+                    <label style="display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer;font-size:13px;"
+                           data-team-item
+                           data-team-id="{{ $team->id }}"
+                           data-team-sport="{{ $team->sport_id }}">
                         <input type="checkbox" name="team_ids[]" value="{{ $team->id }}"
                                {{ in_array($team->id, old('team_ids',[])) ? 'checked' : '' }}
                                style="width:14px;height:14px;accent-color:#3b82f6;">
@@ -73,4 +81,34 @@
         </form>
     </div>
 </div>
+<script>
+(() => {
+    const tournamentSelect = document.getElementById('tournament-select');
+    const teamItems = Array.from(document.querySelectorAll('[data-team-item]'));
+
+    function filterTeams() {
+        const option = tournamentSelect.options[tournamentSelect.selectedIndex];
+        const selectedSport = option?.dataset?.sport || '';
+        const approvedTeams = (option?.dataset?.approvedTeams || '')
+            .split(',')
+            .map(v => v.trim())
+            .filter(Boolean);
+
+        teamItems.forEach(item => {
+            const teamId = item.dataset.teamId;
+            const teamSport = item.dataset.teamSport;
+            const allowed = approvedTeams.includes(teamId) && String(teamSport) === String(selectedSport);
+            item.style.display = allowed ? 'flex' : 'none';
+
+            if (!allowed) {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = false;
+            }
+        });
+    }
+
+    tournamentSelect.addEventListener('change', filterTeams);
+    filterTeams();
+})();
+</script>
 @endsection

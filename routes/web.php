@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── Home 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // ── Auth
@@ -77,6 +77,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'prevent-back-histor
     Route::post('matches', [\App\Http\Controllers\Admin\MatchController::class, 'store'])->name('matches.store');
     Route::get('matches/{match}/edit', [\App\Http\Controllers\Admin\MatchController::class, 'edit'])->name('matches.edit');
     Route::put('matches/{match}', [\App\Http\Controllers\Admin\MatchController::class, 'update'])->name('matches.update');
+    Route::get('matches/{match}/winner', [\App\Http\Controllers\Admin\MatchController::class, 'winnerEdit'])->name('matches.winner.edit');
+    Route::put('matches/{match}/winner', [\App\Http\Controllers\Admin\MatchController::class, 'winnerUpdate'])->name('matches.winner.update');
     Route::delete('matches/{match}', [\App\Http\Controllers\Admin\MatchController::class, 'destroy'])->name('matches.destroy');
     Route::patch('matches/{match}/restore', [\App\Http\Controllers\Admin\MatchController::class, 'restore'])->name('matches.restore');
 
@@ -112,6 +114,8 @@ Route::prefix('organizer')->name('organizer.')->middleware(['auth', 'prevent-bac
     Route::post('matches', [\App\Http\Controllers\Organizer\MatchController::class, 'store'])->name('matches.store');
     Route::get('matches/{match}/edit', [\App\Http\Controllers\Organizer\MatchController::class, 'edit'])->name('matches.edit');
     Route::put('matches/{match}', [\App\Http\Controllers\Organizer\MatchController::class, 'update'])->name('matches.update');
+    Route::get('matches/{match}/winner', [\App\Http\Controllers\Organizer\MatchController::class, 'winnerEdit'])->name('matches.winner.edit');
+    Route::put('matches/{match}/winner', [\App\Http\Controllers\Organizer\MatchController::class, 'winnerUpdate'])->name('matches.winner.update');
     Route::delete('matches/{match}', [\App\Http\Controllers\Organizer\MatchController::class, 'destroy'])->name('matches.destroy');
 
     Route::get('results', [\App\Http\Controllers\Organizer\ResultController::class, 'index'])->name('results.index');
@@ -148,6 +152,7 @@ Route::prefix('player')->name('player.')->middleware(['auth', 'prevent-back-hist
     Route::get('team', [\App\Http\Controllers\Player\TeamController::class, 'show'])->name('team.show');
     Route::get('matches', [\App\Http\Controllers\Player\MatchController::class, 'index'])->name('matches.index');
     Route::get('results', [\App\Http\Controllers\Player\ResultController::class, 'index'])->name('results.index');
+    Route::get('stats', [\App\Http\Controllers\Player\StatController::class, 'index'])->name('stats.index');
 
     Route::get('profile/edit', [\App\Http\Controllers\Player\ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [\App\Http\Controllers\Player\ProfileController::class, 'update'])->name('profile.update');
