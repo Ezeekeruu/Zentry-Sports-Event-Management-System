@@ -49,7 +49,7 @@
 
             <div class="form-group">
                 <label class="form-label">Role</label>
-                <select name="role" class="form-control" required>
+                <select name="role" class="form-control" required id="roleSelect" onchange="toggleSportField()">
                     <option value="">Select role</option>
                     <option value="admin"     {{ old('role') === 'admin'     ? 'selected' : '' }}>Admin</option>
                     <option value="organizer" {{ old('role') === 'organizer' ? 'selected' : '' }}>Organizer</option>
@@ -58,6 +58,27 @@
                     <option value="fan"       {{ old('role') === 'fan'       ? 'selected' : '' }}>Fan</option>
                 </select>
                 @error('role')
+                    <div class="form-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group" id="sportField" style="display:{{ old('role') === 'player' ? 'block' : 'none' }};">
+                <label class="form-label">
+                    Sport
+                    <span style="color:#a855f7;font-size:11px;font-weight:600;margin-left:4px;">● Player Sport</span>
+                </label>
+                <select name="sport_id" class="form-control" id="sportSelect">
+                    <option value="">— Select sport —</option>
+                    @foreach($sports as $sport)
+                        <option value="{{ $sport->id }}" {{ old('sport_id') == $sport->id ? 'selected' : '' }}>
+                            {{ $sport->sport_name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div style="font-size:11px;color:#64748b;margin-top:4px;">
+                    Specifies which sport this player competes in. Required to be added to a team roster.
+                </div>
+                @error('sport_id')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
@@ -83,4 +104,18 @@
         </form>
     </div>
 </div>
+
+<script>
+function toggleSportField() {
+    const role = document.getElementById('roleSelect').value;
+    const field = document.getElementById('sportField');
+    const select = document.getElementById('sportSelect');
+    if (role === 'player') {
+        field.style.display = 'block';
+    } else {
+        field.style.display = 'none';
+        select.value = '';
+    }
+}
+</script>
 @endsection

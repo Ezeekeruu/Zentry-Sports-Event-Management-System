@@ -5,8 +5,7 @@
 @endsection
 
 @section('content')
-<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;">
-<div style="width:100%;max-width:660px;">
+<div style="max-width:660px;margin:0 auto;">
 
     <div class="page-header">
         <div class="page-title">Add Tournament</div>
@@ -94,11 +93,11 @@
                     @enderror
                 </div>
                 <div class="form-group">
-                     <label class="form-label">Max Teams <span style="color:#94a3b8;font-weight:400;"></span></label>
-                     <input type="number" name="max_teams" class="form-control"
-                            value="{{ old('max_teams') }}" min="2" required>
+                    <label class="form-label">Max Teams</label>
+                    <input type="number" name="max_teams" class="form-control"
+                           value="{{ old('max_teams') }}" min="2" required>
                     @error('max_teams')
-                    <div class="form-error">{{ $message }}</div>
+                        <div class="form-error">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
@@ -110,6 +109,5 @@
         </form>
     </div>
 
-</div>
 </div>
 @endsection

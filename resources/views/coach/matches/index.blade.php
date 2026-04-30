@@ -1,6 +1,15 @@
 @extends('layouts.coach')
 
 @section('content')
+
+@if(!$team)
+<div class="card" style="text-align:center;padding:48px;">
+    <div style="font-size:32px;margin-bottom:12px;">🏀</div>
+    <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">No Team Assigned</div>
+    <div style="font-size:13px;color:#64748b;">You have not been assigned as a coach for any team yet. Contact an admin.</div>
+</div>
+@else
+
 <div class="page-header">
     <div class="page-title">Match Schedule</div>
     <div class="page-subtitle">{{ $team->team_name }} matches.</div>
@@ -98,7 +107,7 @@
             </tbody>
         </table>
     </div>
-    @if($matches->hasPages())
+    @if($matches instanceof \Illuminate\Pagination\LengthAwarePaginator && $matches->hasPages())
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:0.5px solid rgba(15,23,42,0.06);">
         <div style="font-size:12px;color:#94a3b8;">Showing {{ $matches->firstItem() }}–{{ $matches->lastItem() }} of {{ $matches->total() }}</div>
         <div style="display:flex;gap:4px;">
@@ -113,4 +122,6 @@
     </div>
     @endif
 </div>
+
+@endif
 @endsection

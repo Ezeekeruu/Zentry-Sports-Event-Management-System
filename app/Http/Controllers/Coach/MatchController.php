@@ -13,7 +13,16 @@ class MatchController extends Controller
 {
     public function index(Request $request): View
     {
-        $team = Team::where('coach_id', auth()->id())->firstOrFail();
+        $team = Team::where('coach_id', auth()->id())->first();
+
+        if (!$team) {
+            return view('coach.matches.index', [
+                'team'          => null,
+                'matches'       => collect(),
+                'calendarMonth' => now()->startOfMonth(),
+                'calendarGrid'  => [],
+            ]);
+        }
 
         $matchQuery = ZentryMatch::whereHas('matchTeams', fn($q) => $q->where('team_id', $team->id))
             ->with(['tournament', 'matchTeams.team', 'matchTeams.result'])
@@ -25,14 +34,14 @@ class MatchController extends Controller
         $calendarMonth = Carbon::createFromFormat('Y-m', $request->get('month', now()->format('Y-m')))
             ->startOfMonth();
         $start = $calendarMonth->copy()->startOfWeek(Carbon::SUNDAY);
-        $end = $calendarMonth->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
+        $end   = $calendarMonth->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
 
         $calendarMatches = (clone $matchQuery)
             ->whereBetween('match_date', [$start->toDateString(), $end->toDateString()])
             ->orderBy('match_date')
             ->orderBy('match_time')
             ->get()
-            ->groupBy(fn ($match) => $match->match_date->toDateString());
+            ->groupBy(fn($match) => $match->match_date->toDateString());
 
         $calendarGrid = [];
         $cursor = $start->copy();
@@ -40,9 +49,9 @@ class MatchController extends Controller
             $week = [];
             for ($i = 0; $i < 7; $i++) {
                 $dateKey = $cursor->toDateString();
-                $week[] = [
-                    'date' => $cursor->copy(),
-                    'matches' => $calendarMatches->get($dateKey, collect()),
+                $week[]  = [
+                    'date'           => $cursor->copy(),
+                    'matches'        => $calendarMatches->get($dateKey, collect()),
                     'isCurrentMonth' => $cursor->month === $calendarMonth->month,
                 ];
                 $cursor->addDay();
@@ -55,7 +64,7 @@ class MatchController extends Controller
 
     public function show(ZentryMatch $match): View
     {
-        $team = Team::where('coach_id', auth()->id())->firstOrFail();
+        $team = Team::where('coach_id', auth()->id())->first();
         $match->load(['tournament', 'matchTeams.team', 'matchTeams.result']);
         return view('coach.matches.show', compact('match', 'team'));
     }

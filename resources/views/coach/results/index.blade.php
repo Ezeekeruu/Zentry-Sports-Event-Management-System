@@ -1,6 +1,15 @@
 @extends('layouts.coach')
 
 @section('content')
+
+@if(!$team)
+<div class="card" style="text-align:center;padding:48px;">
+    <div style="font-size:32px;margin-bottom:12px;">📋</div>
+    <div style="font-family:'Manrope',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">No Team Assigned</div>
+    <div style="font-size:13px;color:#64748b;">You have not been assigned as a coach for any team yet. Contact an admin.</div>
+</div>
+@else
+
 <div class="page-header">
     <div class="page-title">Match Results</div>
     <div class="page-subtitle">{{ $team->team_name }} performance history.</div>
@@ -70,4 +79,6 @@
     </div>
     @endif
 </div>
+
+@endif
 @endsection

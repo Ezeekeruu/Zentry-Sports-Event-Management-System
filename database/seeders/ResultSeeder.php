@@ -15,35 +15,28 @@ class ResultSeeder extends Seeder
 
         foreach ($completedMatches as $match) {
             $matchTeams = MatchTeam::where('match_id', $match->id)
-                                    ->orderByDesc('points_scored')
-                                    ->get();
+                ->orderByDesc('points_scored')
+                ->get();
 
-            if ($matchTeams->isEmpty()) {
-                continue;
-            }
+            if ($matchTeams->isEmpty()) continue;
 
-            foreach ($matchTeams as $rank => $matchTeam) {
-                $matchTeam->update(['rank_position' => $rank + 1]);
-            }
-
-            $winner    = $matchTeams->first();
             $highScore = $matchTeams->max('points_scored');
 
-            foreach ($matchTeams as $matchTeam) {
-                if (Result::where('match_team_id', $matchTeam->id)->exists()) {
-                    continue;
-                }
+            foreach ($matchTeams as $rank => $mt) {
+                $mt->update(['rank_position' => $rank + 1]);
 
-                $isWinner = $matchTeam->id === $winner->id;
+                if (Result::where('match_team_id', $mt->id)->exists()) continue;
+
+                $isWinner = $rank === 0;
 
                 Result::create([
-                    'match_team_id' => $matchTeam->id,
+                    'match_team_id' => $mt->id,
                     'summary'       => $isWinner
-                        ? "Team won with {$matchTeam->points_scored} points."
-                        : "Team scored {$matchTeam->points_scored} points.",
+                        ? "Won with a score of {$mt->points_scored}."
+                        : "Finished with a score of {$mt->points_scored}.",
                     'total_teams'   => $matchTeams->count(),
                     'highest_score' => $highScore,
-                    'recorded_at'   => now()->modify('-' . rand(1, 30) . ' days'),
+                    'recorded_at'   => now()->modify('-' . rand(1, 5) . ' days'),
                 ]);
             }
         }

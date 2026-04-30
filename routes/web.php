@@ -66,11 +66,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'prevent-back-histor
 
     // Registrations
     Route::get('registrations', [\App\Http\Controllers\Admin\RegistrationController::class, 'index'])->name('registrations.index');
+    Route::get('registrations/create', [\App\Http\Controllers\Admin\RegistrationController::class, 'create'])->name('registrations.create');
     Route::post('registrations', [\App\Http\Controllers\Admin\RegistrationController::class, 'store'])->name('registrations.store');
     Route::patch('registrations/{registration}/approve', [\App\Http\Controllers\Admin\RegistrationController::class, 'approve'])->name('registrations.approve');
     Route::patch('registrations/{registration}/reject', [\App\Http\Controllers\Admin\RegistrationController::class, 'reject'])->name('registrations.reject');
     Route::delete('registrations/{registration}', [\App\Http\Controllers\Admin\RegistrationController::class, 'destroy'])->name('registrations.destroy');
-
+    
     // Matches
     Route::get('matches', [\App\Http\Controllers\Admin\MatchController::class, 'index'])->name('matches.index');
     Route::get('matches/create', [\App\Http\Controllers\Admin\MatchController::class, 'create'])->name('matches.create');

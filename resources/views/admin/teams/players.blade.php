@@ -71,13 +71,16 @@
 
     {{-- Add player panel --}}
     <div class="card">
-        <div style="font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">
+        <div style="font-family:'Manrope',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;">
             Add Player
+        </div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:14px;">
+            Only <strong>{{ $team->sport->sport_name ?? '—' }}</strong> players are shown.
         </div>
 
         @if($availablePlayers->isEmpty())
             <div style="font-size:13px;color:#94a3b8;padding:12px 0;">
-                No unassigned players available. 
+                No eligible {{ $team->sport->sport_name ?? '' }} players available.
             </div>
         @else
         <form method="POST" action="{{ route('admin.teams.players.add', $team) }}">
@@ -100,6 +103,24 @@
                 Add to Team
             </button>
         </form>
+        @endif
+
+        {{-- Players with no sport assigned --}}
+        @if($unsportedPlayers->isNotEmpty())
+        <div style="margin-top:16px;border-top:0.5px solid rgba(15,23,42,0.08);padding-top:14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#eab308;text-transform:uppercase;margin-bottom:8px;">
+                ⚠ No Sport Assigned
+            </div>
+            <div style="font-size:12px;color:#64748b;margin-bottom:10px;">
+                These players have no sport set. Assign their sport in Users before adding them to a roster.
+            </div>
+            @foreach($unsportedPlayers as $p)
+                <div style="font-size:12px;font-weight:600;color:#0f172a;padding:4px 0;border-bottom:0.5px solid rgba(15,23,42,0.05);">
+                    {{ $p->first_name }} {{ $p->last_name }}
+                    <span style="font-size:11px;color:#94a3b8;font-weight:400;">{{ $p->email }}</span>
+                </div>
+            @endforeach
+        </div>
         @endif
 
     </div>

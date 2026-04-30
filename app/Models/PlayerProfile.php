@@ -11,6 +11,7 @@ class PlayerProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'sport_id',
         'team_id',
         'position',
         'jersey_number',
@@ -19,6 +20,11 @@ class PlayerProfile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function sport()
+    {
+        return $this->belongsTo(Sport::class);
     }
 
     public function team()

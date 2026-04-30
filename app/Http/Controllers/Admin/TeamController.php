@@ -132,35 +132,55 @@ class TeamController extends Controller
         return redirect()->route('admin.teams.index')->with('success', "\"{$team->team_name}\" has been restored.");
     }
 
-    public function players(Team $team): View
-    {
-        $team->load(['sport', 'coach', 'playerProfiles.user']);
-        $availablePlayers = User::where('role', 'player')
-            ->where('is_active', true)
-            ->whereDoesntHave('playerProfile', fn($q) => $q->whereNotNull('team_id'))
-            ->orderBy('first_name')
-            ->get();
+public function players(Team $team): View
+{
+    $team->load(['sport', 'coach', 'playerProfiles.user']);
 
-        return view('admin.teams.players', compact('team', 'availablePlayers'));
+    $availablePlayers = User::where('role', 'player')
+        ->where('is_active', true)
+        ->whereHas('playerProfile', fn($q) => $q
+            ->whereNull('team_id')
+            ->where('sport_id', $team->sport_id)
+        )
+        ->orderBy('first_name')
+        ->get();
+
+    $unsportedPlayers = User::where('role', 'player')
+        ->where('is_active', true)
+        ->whereHas('playerProfile', fn($q) => $q
+            ->whereNull('team_id')
+            ->whereNull('sport_id')
+        )
+        ->orderBy('first_name')
+        ->get();
+
+    return view('admin.teams.players', compact('team', 'availablePlayers', 'unsportedPlayers'));
+}
+
+public function addPlayer(Request $request, Team $team): RedirectResponse
+{
+    $request->validate(['user_id' => ['required', 'exists:users,id']]);
+
+    $user = User::findOrFail($request->user_id);
+
+    if ($user->playerProfile && $user->playerProfile->team_id) {
+        return back()->with('error', 'This player already belongs to a team.');
     }
 
-    public function addPlayer(Request $request, Team $team): RedirectResponse
-    {
-        $request->validate(['user_id' => ['required', 'exists:users,id']]);
-
-        $user = User::findOrFail($request->user_id);
-
-        if ($user->playerProfile && $user->playerProfile->team_id) {
-            return back()->with('error', 'This player already belongs to a team.');
-        }
-
-        PlayerProfile::updateOrCreate(
-            ['user_id' => $user->id],
-            ['team_id' => $team->id]
+    if ($user->playerProfile && $user->playerProfile->sport_id
+        && $user->playerProfile->sport_id !== $team->sport_id) {
+        return back()->with('error',
+            "{$user->first_name} {$user->last_name} is a {$user->playerProfile->sport->sport_name} player and cannot join a {$team->sport->sport_name} team."
         );
-
-        return back()->with('success', "{$user->first_name} {$user->last_name} added to the team.");
     }
+
+    PlayerProfile::updateOrCreate(
+        ['user_id' => $user->id],
+        ['team_id' => $team->id]
+    );
+
+    return back()->with('success', "{$user->first_name} {$user->last_name} added to the team.");
+}
 
     public function removePlayer(Team $team, PlayerProfile $player): RedirectResponse
     {

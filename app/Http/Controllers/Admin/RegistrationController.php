@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
 use App\Models\Registration;
+use App\Models\Team;
+use App\Models\Tournament;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
-    /**
-     * Admin sees ALL registrations across all tournaments
-     */
     public function index(): View
     {
         $registrations = Registration::with(['team.sport', 'tournament.organizer'])
@@ -22,10 +21,14 @@ class RegistrationController extends Controller
         return view('admin.registrations.index', compact('registrations'));
     }
 
-    /**
-     * Admin uses RegistrationRequest — all BR checks still apply
-     * Admin approves immediately on store
-     */
+    public function create(): View
+    {
+        $teams       = Team::active()->with('sport')->orderBy('team_name')->get();
+        $tournaments = Tournament::whereIn('status', ['upcoming', 'ongoing'])->with('sport')->orderBy('tournament_name')->get();
+
+        return view('admin.registrations.create', compact('teams', 'tournaments'));
+    }
+
     public function store(RegistrationRequest $request): RedirectResponse
     {
         Registration::create([
@@ -44,21 +47,18 @@ class RegistrationController extends Controller
     public function approve(Registration $registration): RedirectResponse
     {
         $registration->update(['status' => 'approved']);
-
         return back()->with('success', 'Registration approved.');
     }
 
     public function reject(Registration $registration): RedirectResponse
     {
         $registration->update(['status' => 'rejected']);
-
         return back()->with('success', 'Registration rejected.');
     }
 
     public function destroy(Registration $registration): RedirectResponse
     {
         $registration->delete();
-
         return back()->with('success', 'Registration removed.');
     }
 }

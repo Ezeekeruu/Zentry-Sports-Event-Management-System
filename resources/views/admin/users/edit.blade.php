@@ -38,7 +38,7 @@
 
             <div class="form-group">
                 <label class="form-label">Role</label>
-                <select name="role" class="form-control" required>
+                <select name="role" class="form-control" required id="roleSelect" onchange="toggleSportField()">
                     <option value="admin"     {{ $user->role === 'admin'     ? 'selected' : '' }}>Admin</option>
                     <option value="organizer" {{ $user->role === 'organizer' ? 'selected' : '' }}>Organizer</option>
                     <option value="coach"     {{ $user->role === 'coach'     ? 'selected' : '' }}>Coach</option>
@@ -46,6 +46,26 @@
                     <option value="fan"       {{ $user->role === 'fan'       ? 'selected' : '' }}>Fan</option>
                 </select>
                 @error('role') <div class="form-error">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="form-group" id="sportField" style="display:{{ $user->role === 'player' ? 'block' : 'none' }};">
+                <label class="form-label">
+                    Sport
+                    <span style="color:#a855f7;font-size:11px;font-weight:600;margin-left:4px;">● Player Sport</span>
+                </label>
+                <select name="sport_id" class="form-control" id="sportSelect">
+                    <option value="">— Select sport —</option>
+                    @foreach($sports as $sport)
+                        @php $currentSportId = old('sport_id', $user->playerProfile?->sport_id); @endphp
+                        <option value="{{ $sport->id }}" {{ $currentSportId == $sport->id ? 'selected' : '' }}>
+                            {{ $sport->sport_name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div style="font-size:11px;color:#64748b;margin-top:4px;">
+                    Specifies which sport this player competes in. Required to be added to a team roster.
+                </div>
+                @error('sport_id') <div class="form-error">{{ $message }}</div> @enderror
             </div>
 
             <div class="form-group">
@@ -77,4 +97,18 @@
 
 </div>
 </div>
-@endsection 
+
+<script>
+function toggleSportField() {
+    const role = document.getElementById('roleSelect').value;
+    const field = document.getElementById('sportField');
+    const select = document.getElementById('sportSelect');
+    if (role === 'player') {
+        field.style.display = 'block';
+    } else {
+        field.style.display = 'none';
+        select.value = '';
+    }
+}
+</script>
+@endsection

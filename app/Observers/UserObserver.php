@@ -35,6 +35,7 @@ class UserObserver
             'player' => PlayerProfile::firstOrCreate(
                 ['user_id' => $user->id],
                 [
+                    'sport_id'      => null,
                     'team_id'       => null,
                     'position'      => null,
                     'jersey_number' => null,

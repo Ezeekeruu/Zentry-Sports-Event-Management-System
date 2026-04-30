@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Sport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +32,8 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('admin.users.create');
+        $sports = Sport::where('is_active', true)->orderBy('sport_name')->get();
+        return view('admin.users.create', compact('sports'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -42,9 +44,10 @@ class UserController extends Controller
             'email'      => ['required', 'email', 'unique:users,email'],
             'password'   => ['required', 'string', 'min:8', 'confirmed'],
             'role'       => ['required', 'in:admin,organizer,coach,player,fan'],
+            'sport_id'   => ['nullable', 'exists:sports,id'],
         ]);
 
-        User::create([
+        $user = User::create([
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
             'email'      => $request->email,
@@ -53,14 +56,17 @@ class UserController extends Controller
             'is_active'  => true,
         ]);
 
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+        if ($user->role === 'player' && $request->filled('sport_id')) {
+            $user->playerProfile()->update(['sport_id' => $request->sport_id]);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
     public function edit(User $user): View
     {
-        return view('admin.users.edit', compact('user'));
+        $sports = Sport::where('is_active', true)->orderBy('sport_name')->get();
+        return view('admin.users.edit', compact('user', 'sports'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -71,6 +77,7 @@ class UserController extends Controller
             'email'      => ['required', 'email', 'unique:users,email,' . $user->id],
             'role'       => ['required', 'in:admin,organizer,coach,player,fan'],
             'password'   => ['nullable', 'string', 'min:8', 'confirmed'],
+            'sport_id'   => ['nullable', 'exists:sports,id'],
         ]);
 
         $user->update([
@@ -85,9 +92,15 @@ class UserController extends Controller
             $user->update(['password' => Hash::make($request->password)]);
         }
 
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', 'User updated successfully.');
+        if ($user->role === 'player') {
+            $user->refresh();
+            $user->playerProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                ['sport_id' => $request->filled('sport_id') ? $request->sport_id : null]
+            );
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user): RedirectResponse
@@ -95,20 +108,13 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot archive your own account.');
         }
-
         $user->update(['is_active' => false]);
-
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', "{$user->full_name} has been archived.");
+        return redirect()->route('admin.users.index')->with('success', "{$user->full_name} has been archived.");
     }
 
     public function restore(User $user): RedirectResponse
     {
         $user->update(['is_active' => true]);
-
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', "{$user->full_name} has been restored.");
+        return redirect()->route('admin.users.index')->with('success', "{$user->full_name} has been restored.");
     }
 }
