@@ -14,26 +14,34 @@
 @else
 
 <div class="grid-4" style="margin-bottom:20px;">
-    <div class="stat-card">
-        <div class="stat-label">Team</div>
-        <div class="stat-value" style="font-size:20px;margin-top:4px;">{{ $team->team_name }}</div>
-        <div class="stat-sub">{{ $team->sport->sport_name ?? '' }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Players</div>
-        <div class="stat-value">{{ $team->playerProfiles->count() }}</div>
-        <div class="stat-sub">On roster</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Upcoming Matches</div>
-        <div class="stat-value">{{ $upcomingMatches->count() }}</div>
-        <div class="stat-sub">Scheduled</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Founded</div>
-        <div class="stat-value" style="font-size:20px;margin-top:4px;">{{ $team->founded_at?->format('Y') ?? '—' }}</div>
-        <div class="stat-sub">Year established</div>
-    </div>
+    <a href="{{ route('coach.team.show') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Team</div>
+            <div class="stat-value" style="font-size:20px;margin-top:4px;">{{ $team->team_name }}</div>
+            <div class="stat-sub">{{ $team->sport->sport_name ?? '' }}</div>
+        </div>
+    </a>
+    <a href="{{ route('coach.team.players') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Players</div>
+            <div class="stat-value">{{ $team->playerProfiles->count() }}</div>
+            <div class="stat-sub">On roster</div>
+        </div>
+    </a>
+    <a href="{{ route('coach.matches.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Upcoming Matches</div>
+            <div class="stat-value">{{ $upcomingMatches->count() }}</div>
+            <div class="stat-sub">Scheduled</div>
+        </div>
+    </a>
+    <a href="{{ route('coach.results.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Founded</div>
+            <div class="stat-value" style="font-size:20px;margin-top:4px;">{{ $team->founded_at?->format('Y') ?? '—' }}</div>
+            <div class="stat-sub">Year established</div>
+        </div>
+    </a>
 </div>
 
 <div class="grid-2">
@@ -50,7 +58,10 @@
                 <thead><tr><th>Opponent(s)</th><th>Tournament</th><th>Date</th></tr></thead>
                 <tbody>
                     @foreach($upcomingMatches as $match)
-                    <tr>
+                    <tr onclick="window.location='{{ route('coach.matches.show', $match) }}'"
+                        style="cursor:pointer;transition:background .12s;"
+                        onmouseover="this.style.background='#fefce8'"
+                        onmouseout="this.style.background=''">
                         <td style="font-weight:600;font-size:12px;">
                             {{ $match->matchTeams->filter(fn($mt)=>$mt->team_id!==$team->id)->map(fn($mt)=>$mt->team->team_name??'?')->join(', ') ?: 'TBD' }}
                         </td>
@@ -70,14 +81,18 @@
             <a href="{{ route('coach.team.players') }}" style="font-size:11px;color:#eab308;font-weight:600;text-decoration:none;">Manage →</a>
         </div>
         @if($team->playerProfiles->isEmpty())
-            <div style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">No players yet. <a href="{{ route('coach.team.players') }}" style="color:#eab308;text-decoration:none;">Add players →</a></div>
+            <div style="text-align:center;color:#94a3b8;padding:20px;font-size:13px;">
+                No players yet. <a href="{{ route('coach.team.players') }}" style="color:#eab308;text-decoration:none;">Add players →</a>
+            </div>
         @else
         <div class="table-wrap">
             <table>
                 <thead><tr><th>Player</th><th>Email</th></tr></thead>
                 <tbody>
                     @foreach($team->playerProfiles->take(6) as $profile)
-                    <tr>
+                    <tr style="transition:background .12s;"
+                        onmouseover="this.style.background='#fefce8'"
+                        onmouseout="this.style.background=''">
                         <td>
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <div class="avatar">{{ strtoupper(substr($profile->user->first_name??'?',0,1)) }}</div>

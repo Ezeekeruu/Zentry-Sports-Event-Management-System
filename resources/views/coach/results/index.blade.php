@@ -15,49 +15,103 @@
     <div class="page-subtitle">{{ $team->team_name }} performance history.</div>
 </div>
 
+{{-- Filters --}}
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <form method="GET" action="{{ route('coach.results.index') }}" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+
+        {{-- Tournament filter --}}
+        <select name="tournament_id" onchange="this.form.submit()"
+                style="padding:7px 12px;border:1px solid rgba(15,23,42,0.12);border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;color:#0f172a;background:#fff;outline:none;cursor:pointer;">
+            <option value="">All Tournaments</option>
+            @foreach($tournaments as $t)
+                <option value="{{ $t->id }}" {{ request('tournament_id') == $t->id ? 'selected' : '' }}>
+                    {{ $t->tournament_name }}
+                </option>
+            @endforeach
+        </select>
+
+        {{-- Outcome filter --}}
+        <select name="outcome" onchange="this.form.submit()"
+                style="padding:7px 12px;border:1px solid rgba(15,23,42,0.12);border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;color:#0f172a;background:#fff;outline:none;cursor:pointer;">
+            <option value="">All Outcomes</option>
+            <option value="win"  {{ request('outcome') === 'win'  ? 'selected' : '' }}>Wins Only</option>
+            <option value="loss" {{ request('outcome') === 'loss' ? 'selected' : '' }}>Losses Only</option>
+        </select>
+
+        @if(request('tournament_id') || request('outcome'))
+            <a href="{{ route('coach.results.index') }}" class="btn-secondary" style="padding:7px 12px;font-size:12px;">Clear</a>
+        @endif
+    </form>
+</div>
+
 <div class="card">
     <div class="table-wrap">
         <table>
             <thead>
-                <tr><th>Tournament</th><th>Match</th><th>Date</th><th>Points</th><th>Rank</th><th>Result</th></tr>
+                <tr>
+                    <th>Opponent</th>
+                    <th>Round</th>
+                    <th>Tournament</th>
+                    <th>Date</th>
+                    <th>Score</th>
+                    <th>Outcome</th>
+                </tr>
             </thead>
             <tbody>
                 @forelse($matchTeams as $mt)
+                @php
+                    // Get opponent team(s) from the same match
+                    $opponents = $mt->match->matchTeams
+                        ->where('team_id', '!=', $team->id)
+                        ->map(fn($o) => $o->team->team_name ?? '?')
+                        ->join(' & ');
+
+                    // Our score vs their score
+                    $ourScore  = $mt->points_scored;
+                    $theirMt   = $mt->match->matchTeams->where('team_id', '!=', $team->id)->first();
+                    $theirScore = $theirMt?->points_scored;
+
+                    // Outcome
+                    $isWin  = $mt->rank_position === 1;
+                    $isDraw = !$isWin && $mt->rank_position !== null && $mt->match->matchTeams->where('rank_position', 1)->count() === 0;
+                @endphp
                 <tr>
-                    <td style="font-size:12px;font-weight:500;">{{ Str::limit($mt->match->tournament->tournament_name??'—',24) }}</td>
-                    <td style="font-size:12px;color:#64748b;">{{ $mt->match->round_name ?: ('Match #'.$mt->match->id) }}</td>
-                    <td style="font-size:11px;color:#64748b;">{{ $mt->match->match_date->format('M d, Y') }}</td>
                     <td>
-                        @if($mt->points_scored !== null)
-                            <span style="font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;color:#0f172a;">{{ $mt->points_scored }}</span>
-                            <span style="font-size:10px;color:#94a3b8;">pts</span>
+                        <div style="font-weight:700;font-size:13px;">vs {{ $opponents ?: 'TBD' }}</div>
+                    </td>
+                    <td style="font-size:12px;font-weight:600;color:#334155;">
+                        {{ $mt->match->round_name ?: 'Match #' . $mt->match->id }}
+                    </td>
+                    <td style="font-size:12px;color:#64748b;">
+                        {{ Str::limit($mt->match->tournament->tournament_name ?? '—', 22) }}
+                    </td>
+                    <td style="font-size:11px;color:#64748b;">
+                        {{ $mt->match->match_date->format('M d, Y') }}
+                    </td>
+                    <td>
+                        @if($ourScore !== null && $theirScore !== null)
+                            <span style="font-family:'Manrope',sans-serif;font-size:15px;font-weight:900;color:#0f172a;">
+                                {{ $ourScore }} – {{ $theirScore }}
+                            </span>
+                        @elseif($ourScore !== null)
+                            <span style="font-family:'Manrope',sans-serif;font-size:15px;font-weight:900;color:#0f172a;">{{ $ourScore }} pts</span>
                         @else
                             <span style="color:#94a3b8;font-size:12px;">—</span>
                         @endif
                     </td>
                     <td>
-                        @if($mt->rank_position === 1) <span class="badge badge-amber">🥇 1st</span>
-                        @elseif($mt->rank_position === 2) <span class="badge badge-gray">🥈 2nd</span>
-                        @elseif($mt->rank_position === 3) <span class="badge badge-gray">🥉 3rd</span>
-                        @elseif($mt->rank_position) <span class="badge badge-gray">#{{ $mt->rank_position }}</span>
-                        @else <span style="color:#94a3b8;font-size:12px;">—</span> @endif
-                    </td>
-                    <td>
-                        @if($mt->result)
-                            <span class="badge badge-green">RECORDED</span>
-                            @if($mt->result->summary)
-                                <div style="font-size:10px;color:#64748b;margin-top:3px;">{{ Str::limit($mt->result->summary,40) }}</div>
-                            @endif
+                        @if($mt->rank_position === 1)
+                            <span class="badge badge-green">🏆 WIN</span>
+                        @elseif($mt->rank_position === null)
+                            <span class="badge badge-gray">—</span>
                         @else
-                            <span class="badge badge-gray">NO RESULT</span>
+                            <span class="badge badge-red">LOSS</span>
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">
-                        No completed matches yet.
-                    </td>
+                    <td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No results found.</td>
                 </tr>
                 @endforelse
             </tbody>

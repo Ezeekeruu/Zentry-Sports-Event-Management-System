@@ -11,52 +11,55 @@ class StandingController extends Controller
 {
     public function index(Request $request): View
     {
+        $status     = $request->get('status', '');
         $tournament = null;
         $standings  = collect();
         $bracketRounds = collect();
 
         $tournaments = Tournament::where('is_active', true)
-            ->whereIn('status', ['ongoing', 'completed'])
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->when(!$status, fn($q) => $q->whereIn('status', ['ongoing', 'completed']))
             ->with('sport')
             ->orderBy('tournament_name')
             ->get();
 
         if ($request->tournament_id) {
-            $tournament = Tournament::with(['sport', 'matches.matchTeams.team', 'matches.matchTeams.result'])
-                ->findOrFail($request->tournament_id);
+            $tournament = Tournament::with([
+                'sport',
+                'matches.matchTeams.team',
+                'matches.matchTeams.result',
+            ])->find($request->tournament_id);
 
-            [$standings, $bracketRounds] = $this->buildStandingsAndBracket($tournament);
+            if ($tournament) {
+                [$standings, $bracketRounds] = $this->buildStandingsAndBracket($tournament);
+            }
         }
 
-        return view('public.standings.index', compact('tournaments', 'tournament', 'standings', 'bracketRounds'));
+        return view('public.standings.index', compact(
+            'tournaments', 'tournament', 'standings', 'bracketRounds', 'status'
+        ));
     }
 
     private function buildStandingsAndBracket(Tournament $tournament): array
     {
         $teamStats = [];
         $matches = $tournament->matches
-            ->sortBy([
-                ['match_date', 'asc'],
-                ['match_time', 'asc'],
-                ['id', 'asc'],
-            ])
+            ->sortBy([['match_date', 'asc'], ['match_time', 'asc'], ['id', 'asc']])
             ->values();
 
         foreach ($matches as $match) {
-            if ($match->status !== 'completed') {
-                continue;
-            }
+            if ($match->status !== 'completed') continue;
 
             foreach ($match->matchTeams as $mt) {
                 $tid = $mt->team_id;
-                if (! isset($teamStats[$tid])) {
+                if (!isset($teamStats[$tid])) {
                     $teamStats[$tid] = [
-                        'team' => $mt->team,
+                        'team'           => $mt->team,
                         'matches_played' => 0,
-                        'wins' => 0,
-                        'draws' => 0,
-                        'losses' => 0,
-                        'total_points' => 0,
+                        'wins'           => 0,
+                        'draws'          => 0,
+                        'losses'         => 0,
+                        'total_points'   => 0,
                     ];
                 }
                 $teamStats[$tid]['matches_played']++;
@@ -66,44 +69,28 @@ class StandingController extends Controller
             [$winnerIds, $drawIds] = $this->resolveMatchOutcome($match);
             foreach ($match->matchTeams as $mt) {
                 $tid = $mt->team_id;
-                if (in_array($tid, $winnerIds, true)) {
-                    $teamStats[$tid]['wins']++;
-                } elseif (in_array($tid, $drawIds, true)) {
-                    $teamStats[$tid]['draws']++;
-                } else {
-                    $teamStats[$tid]['losses']++;
-                }
+                if (in_array($tid, $winnerIds, true))     $teamStats[$tid]['wins']++;
+                elseif (in_array($tid, $drawIds, true))   $teamStats[$tid]['draws']++;
+                else                                       $teamStats[$tid]['losses']++;
             }
         }
 
         $standings = collect($teamStats)
             ->sortByDesc('total_points')
-            ->sortByDesc('draws')
             ->sortByDesc('wins')
             ->values();
 
         $bracketRounds = $matches
-            ->groupBy(fn ($match) => $match->round_name ?: 'Round ' . $match->id)
-            ->map(function ($roundMatches) {
-                return $roundMatches->map(function ($match) {
-                    [$winnerIds, $drawIds] = $this->resolveMatchOutcome($match);
-                    $winners = $match->matchTeams
-                        ->filter(fn ($mt) => in_array($mt->team_id, $winnerIds, true))
-                        ->map(fn ($mt) => $mt->team->team_name ?? 'TBD')
-                        ->values();
-                    $drawn = $match->matchTeams
-                        ->filter(fn ($mt) => in_array($mt->team_id, $drawIds, true))
-                        ->map(fn ($mt) => $mt->team->team_name ?? 'TBD')
-                        ->values();
-
-                    return [
-                        'match' => $match,
-                        'teams' => $match->matchTeams->map(fn ($mt) => $mt->team->team_name ?? 'TBD')->values(),
-                        'winners' => $winners,
-                        'drawn' => $drawn,
-                    ];
-                });
-            });
+            ->groupBy(fn($m) => $m->round_name ?: 'Round ' . $m->id)
+            ->map(fn($roundMatches) => $roundMatches->map(function ($match) {
+                [$winnerIds, $drawIds] = $this->resolveMatchOutcome($match);
+                return [
+                    'match'   => $match,
+                    'teams'   => $match->matchTeams->map(fn($mt) => $mt->team->team_name ?? 'TBD')->values(),
+                    'winners' => $match->matchTeams->filter(fn($mt) => in_array($mt->team_id, $winnerIds, true))->map(fn($mt) => $mt->team->team_name ?? 'TBD')->values(),
+                    'drawn'   => $match->matchTeams->filter(fn($mt) => in_array($mt->team_id, $drawIds, true))->map(fn($mt) => $mt->team->team_name ?? 'TBD')->values(),
+                ];
+            }));
 
         return [$standings, $bracketRounds];
     }
@@ -111,31 +98,24 @@ class StandingController extends Controller
     private function resolveMatchOutcome($match): array
     {
         $matchTeams = $match->matchTeams->values();
-        if ($matchTeams->isEmpty()) {
-            return [[], []];
-        }
+        if ($matchTeams->isEmpty()) return [[], []];
 
-        $hasScores = $matchTeams->every(fn ($mt) => $mt->points_scored !== null);
+        $hasScores = $matchTeams->every(fn($mt) => $mt->points_scored !== null);
         if ($hasScores) {
             $maxScore = $matchTeams->max('points_scored');
-            $leaders = $matchTeams->filter(fn ($mt) => (int) $mt->points_scored === (int) $maxScore)->values();
-            if ($leaders->count() === 1) {
-                return [[$leaders->first()->team_id], []];
-            }
-            return [[], $leaders->pluck('team_id')->all()];
+            $leaders  = $matchTeams->filter(fn($mt) => (int)$mt->points_scored === (int)$maxScore)->values();
+            return $leaders->count() === 1
+                ? [[$leaders->first()->team_id], []]
+                : [[], $leaders->pluck('team_id')->all()];
         }
 
-        $withRank = $matchTeams->filter(fn ($mt) => $mt->rank_position !== null)->values();
-        if ($withRank->isEmpty()) {
-            return [[], []];
-        }
+        $withRank = $matchTeams->filter(fn($mt) => $mt->rank_position !== null)->values();
+        if ($withRank->isEmpty()) return [[], []];
 
         $bestRank = $withRank->min('rank_position');
-        $leaders = $withRank->filter(fn ($mt) => (int) $mt->rank_position === (int) $bestRank)->values();
-        if ($leaders->count() === 1) {
-            return [[$leaders->first()->team_id], []];
-        }
-
-        return [[], $leaders->pluck('team_id')->all()];
+        $leaders  = $withRank->filter(fn($mt) => (int)$mt->rank_position === (int)$bestRank)->values();
+        return $leaders->count() === 1
+            ? [[$leaders->first()->team_id], []]
+            : [[], $leaders->pluck('team_id')->all()];
     }
 }

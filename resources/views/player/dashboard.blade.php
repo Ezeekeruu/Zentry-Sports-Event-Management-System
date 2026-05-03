@@ -7,21 +7,27 @@
 </div>
 
 <div class="grid-3" style="margin-bottom:20px;">
-    <div class="stat-card">
-        <div class="stat-label">My Team</div>
-        <div class="stat-value" style="font-size:18px;margin-top:4px;">{{ $team?->team_name ?? 'None' }}</div>
-        <div class="stat-sub">{{ $team?->sport->sport_name ?? 'Not assigned' }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Upcoming Matches</div>
-        <div class="stat-value">{{ $upcomingMatches->count() }}</div>
-        <div class="stat-sub">Scheduled ahead</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Teammates</div>
-        <div class="stat-value">{{ $team ? $team->playerProfiles->count() - 1 : 0 }}</div>
-        <div class="stat-sub">On the roster</div>
-    </div>
+    <a href="{{ $team ? route('player.team.show') : '#' }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">My Team</div>
+            <div class="stat-value" style="font-size:18px;margin-top:4px;">{{ $team?->team_name ?? 'None' }}</div>
+            <div class="stat-sub">{{ $team?->sport->sport_name ?? 'Not assigned' }}</div>
+        </div>
+    </a>
+    <a href="{{ route('player.matches.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Upcoming Matches</div>
+            <div class="stat-value">{{ $upcomingMatches->count() }}</div>
+            <div class="stat-sub">Scheduled ahead</div>
+        </div>
+    </a>
+    <a href="{{ $team ? route('player.team.show') : '#' }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Teammates</div>
+            <div class="stat-value">{{ $team ? $team->playerProfiles->count() - 1 : 0 }}</div>
+            <div class="stat-sub">On the roster</div>
+        </div>
+    </a>
 </div>
 
 @if(!$team)
@@ -45,7 +51,9 @@
                 <thead><tr><th>Opponent(s)</th><th>Tournament</th><th>Date</th></tr></thead>
                 <tbody>
                     @foreach($upcomingMatches as $match)
-                    <tr>
+                    <tr style="cursor:pointer;transition:background .12s;"
+                        onmouseover="this.style.background='#faf5ff'"
+                        onmouseout="this.style.background=''">
                         <td style="font-weight:600;font-size:12px;">
                             {{ $match->matchTeams->filter(fn($mt)=>$mt->team_id!==$team->id)->map(fn($mt)=>$mt->team->team_name??'?')->join(', ') ?: 'TBD' }}
                         </td>
@@ -69,7 +77,9 @@
                 <thead><tr><th>Teammate</th><th></th></tr></thead>
                 <tbody>
                     @foreach($team->playerProfiles->take(6) as $p)
-                    <tr>
+                    <tr style="transition:background .12s;"
+                        onmouseover="this.style.background='#faf5ff'"
+                        onmouseout="this.style.background=''">
                         <td>
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <div class="avatar">{{ strtoupper(substr($p->user->first_name??'?',0,1)) }}</div>

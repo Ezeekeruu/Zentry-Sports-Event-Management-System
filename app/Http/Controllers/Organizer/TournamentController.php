@@ -63,8 +63,17 @@ class TournamentController extends Controller
     public function show(Tournament $tournament): View
     {
         $this->authorizeOrganizer($tournament);
-        $tournament->load(['sport', 'registrations.team', 'matches.matchTeams.team']);
-        return view('organizer.tournaments.show', compact('tournament'));
+
+        $tournament->load([
+            'sport',
+            'registrations.team',
+            'matches.matchTeams.team',
+            'matches.matchTeams.result',
+        ]);
+
+        $standings = $this->buildStandings($tournament);
+
+        return view('organizer.tournaments.show', compact('tournament', 'standings'));
     }
 
     public function edit(Tournament $tournament): View
@@ -104,5 +113,48 @@ class TournamentController extends Controller
         if ($tournament->organizer_id !== auth()->id()) {
             abort(403);
         }
+    }
+
+    private function buildStandings(Tournament $tournament): \Illuminate\Support\Collection
+    {
+        $teamStats = [];
+
+        foreach ($tournament->matches as $match) {
+            if ($match->status !== 'completed') continue;
+
+            $matchTeams = $match->matchTeams->values();
+            $hasScores  = $matchTeams->every(fn($mt) => $mt->points_scored !== null);
+            $maxScore   = $hasScores ? $matchTeams->max('points_scored') : null;
+
+            foreach ($matchTeams as $mt) {
+                $tid = $mt->team_id;
+                if (!isset($teamStats[$tid])) {
+                    $teamStats[$tid] = [
+                        'team'           => $mt->team,
+                        'matches_played' => 0,
+                        'wins'           => 0,
+                        'draws'          => 0,
+                        'losses'         => 0,
+                        'total_points'   => 0,
+                    ];
+                }
+
+                $teamStats[$tid]['matches_played']++;
+                $teamStats[$tid]['total_points'] += $mt->points_scored ?? 0;
+
+                if ($hasScores) {
+                    $leaders = $matchTeams->filter(fn($m) => (int)$m->points_scored === (int)$maxScore);
+
+                    if ($leaders->count() === 1 && (int)$mt->points_scored === (int)$maxScore)
+                        $teamStats[$tid]['wins']++;
+                    elseif ($leaders->count() > 1 && (int)$mt->points_scored === (int)$maxScore)
+                        $teamStats[$tid]['draws']++;
+                    else
+                        $teamStats[$tid]['losses']++;
+                }
+            }
+        }
+
+        return collect($teamStats)->sortByDesc('total_points')->sortByDesc('wins')->values();
     }
 }

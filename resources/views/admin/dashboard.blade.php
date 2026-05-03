@@ -9,26 +9,34 @@
 </div>
 
 <div class="grid-4">
-    <div class="stat-card">
-        <div class="stat-label">Total Users</div>
-        <div class="stat-value">{{ $totalUsers }}</div>
-        <div class="stat-sub">All roles combined</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Active Tournaments</div>
-        <div class="stat-value">{{ $activeTournaments }}</div>
-        <div class="stat-sub">Ongoing right now</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Total Teams</div>
-        <div class="stat-value">{{ $totalTeams }}</div>
-        <div class="stat-sub">Across all sports</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Matches Today</div>
-        <div class="stat-value">{{ $matchesToday }}</div>
-        <div class="stat-sub">Scheduled for today</div>
-    </div>
+    <a href="{{ route('admin.users.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">{{ $totalUsers }}</div>
+            <div class="stat-sub">All roles combined</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.tournaments.index', ['status' => 'ongoing']) }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Active Tournaments</div>
+            <div class="stat-value">{{ $activeTournaments }}</div>
+            <div class="stat-sub">Ongoing right now</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.teams.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Total Teams</div>
+            <div class="stat-value">{{ $totalTeams }}</div>
+            <div class="stat-sub">Across all sports</div>
+        </div>
+    </a>
+    <a href="{{ route('admin.matches.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Matches Today</div>
+            <div class="stat-value">{{ $matchesToday }}</div>
+            <div class="stat-sub">Scheduled for today</div>
+        </div>
+    </a>
 </div>
 
 <div class="grid-2">
@@ -48,7 +56,10 @@
                 </thead>
                 <tbody>
                     @forelse($recentTournaments as $tournament)
-                    <tr>
+                    <tr onclick="window.location='{{ route('admin.tournaments.show', $tournament) }}'"
+                        style="cursor:pointer;transition:background .12s;"
+                        onmouseover="this.style.background='#f8faff'"
+                        onmouseout="this.style.background=''">
                         <td>
                             <div style="font-weight:600;font-size:12px;">{{ $tournament->tournament_name }}</div>
                             <div style="font-size:10px;color:#94a3b8;">{{ $tournament->organizer->full_name }}</div>
@@ -88,7 +99,10 @@
                 </thead>
                 <tbody>
                     @forelse($recentUsers as $user)
-                    <tr>
+                    <tr onclick="window.location='{{ route('admin.users.edit', $user) }}'"
+                        style="cursor:pointer;transition:background .12s;"
+                        onmouseover="this.style.background='#f8faff'"
+                        onmouseout="this.style.background=''">
                         <td>
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <div class="avatar">{{ strtoupper(substr($user->first_name, 0, 1)) }}</div>

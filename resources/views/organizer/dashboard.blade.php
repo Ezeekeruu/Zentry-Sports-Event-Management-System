@@ -7,27 +7,29 @@
 </div>
 
 <div class="grid-3" style="margin-bottom:20px;">
-    <div class="stat-card">
-        <div class="stat-label">My Tournaments</div>
-        <div class="stat-value">{{ $myTournaments }}</div>
-        <div class="stat-sub">Total created</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Ongoing</div>
-        <div class="stat-value">{{ $ongoingTournaments }}</div>
-        <div class="stat-sub">Active right now</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Pending Registrations</div>
-        <div class="stat-value">{{ $pendingRegistrations }}</div>
-        <div class="stat-sub">
-            @if($pendingRegistrations > 0)
-                <a href="{{ route('organizer.registrations.index') }}" style="color:#3b82f6;text-decoration:none;">Review now →</a>
-            @else
-                All caught up
-            @endif
+    <a href="{{ route('organizer.tournaments.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">My Tournaments</div>
+            <div class="stat-value">{{ $myTournaments }}</div>
+            <div class="stat-sub">Total created</div>
         </div>
-    </div>
+    </a>
+    <a href="{{ route('organizer.tournaments.index', ['status' => 'ongoing']) }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Ongoing</div>
+            <div class="stat-value">{{ $ongoingTournaments }}</div>
+            <div class="stat-sub">Active right now</div>
+        </div>
+    </a>
+    <a href="{{ route('organizer.registrations.index') }}" style="text-decoration:none;">
+        <div class="stat-card" style="cursor:pointer;transition:box-shadow .15s,transform .15s;" onmouseover="this.style.boxShadow='0 4px 24px rgba(15,23,42,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+            <div class="stat-label">Pending Registrations</div>
+            <div class="stat-value">{{ $pendingRegistrations }}</div>
+            <div class="stat-sub">
+                @if($pendingRegistrations > 0) Review now → @else All caught up @endif
+            </div>
+        </div>
+    </a>
 </div>
 
 <div class="card">
@@ -46,33 +48,29 @@
                     <th>Sport</th>
                     <th>Dates</th>
                     <th>Status</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($recentTournaments as $t)
-                <tr>
+                <tr onclick="window.location='{{ route('organizer.tournaments.show', $t) }}'"
+                    style="cursor:pointer;transition:background .12s;"
+                    onmouseover="this.style.background='#eff6ff'"
+                    onmouseout="this.style.background=''">
                     <td style="font-weight:600;font-size:13px;">{{ $t->tournament_name }}</td>
                     <td><span class="badge badge-blue">{{ $t->sport->sport_name ?? '—' }}</span></td>
                     <td style="font-size:11px;color:#64748b;">
                         {{ $t->start_date->format('M d') }} – {{ $t->end_date->format('M d, Y') }}
                     </td>
                     <td>
-                        @if($t->status === 'ongoing')
-                            <span class="badge badge-green">ONGOING</span>
-                        @elseif($t->status === 'upcoming')
-                            <span class="badge badge-blue">UPCOMING</span>
-                        @else
-                            <span class="badge badge-gray">COMPLETED</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('organizer.tournaments.show', $t) }}"
-                           style="font-size:11px;color:#3b82f6;font-weight:600;text-decoration:none;">View →</a>
+                        @if($t->status === 'ongoing') <span class="badge badge-green">ONGOING</span>
+                        @elseif($t->status === 'upcoming') <span class="badge badge-blue">UPCOMING</span>
+                        @else <span class="badge badge-gray">COMPLETED</span> @endif
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px;font-size:13px;">No tournaments yet. <a href="{{ route('organizer.tournaments.create') }}" style="color:#3b82f6;text-decoration:none;">Create one →</a></td></tr>
+                <tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px;font-size:13px;">
+                    No tournaments yet. <a href="{{ route('organizer.tournaments.create') }}" style="color:#3b82f6;text-decoration:none;">Create one →</a>
+                </td></tr>
                 @endforelse
             </tbody>
         </table>
