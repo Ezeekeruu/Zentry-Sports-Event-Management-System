@@ -1,5 +1,5 @@
 vendor
-
+storage_logs
 node_modules
-
+.env
 .git
