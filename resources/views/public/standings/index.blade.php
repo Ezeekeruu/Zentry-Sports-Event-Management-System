@@ -83,7 +83,7 @@
         <div class="card" style="margin-bottom:20px;padding:32px 24px 0;overflow:hidden;">
             <div style="text-align:center;margin-bottom:28px;">
                 <div style="font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;color:#94a3b8;text-transform:uppercase;margin-bottom:4px;">Tournament Champions</div>
-                <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:900;color:#0f172a;">🏆 Final Podium</div>
+                <div style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:900;color:#0f172a;">🏆 </div>
             </div>
             <div style="display:flex;align-items:flex-end;justify-content:center;max-width:600px;margin:0 auto;">
                 <div style="flex:1;display:flex;flex-direction:column;align-items:center;">

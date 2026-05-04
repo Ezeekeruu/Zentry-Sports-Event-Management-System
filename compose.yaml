@@ -1,0 +1,6 @@
+services:
+  gilayfinalproject:
+    image: gilayfinalproject
+    build:
+      context: .
+      dockerfile: ./Dockerfile
